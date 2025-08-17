@@ -27,26 +27,10 @@ confirmCheckbox.addEventListener('change', function () {
     btnAceptar.disabled = !this.checked;
 });
 
-//buscador
-document.getElementById('searchBox').addEventListener('input', function () {
-    let filtro = this.value.toLowerCase();
-    let filas = document.querySelectorAll('#tablaUsuarios tbody tr');
-    console.log('Filas encontradas:', filas.length);
-
-    filas.forEach(fila => {
-        let texto = fila.textContent.toLowerCase();
-        console.log('Fila:', texto);
-        fila.style.display = texto.includes(filtro) ? '' : 'none';
-    });
-    const coincideBusqueda = textoBusqueda === "" || textoFila.includes(textoBusqueda);
-});
-
-//filtro
 document.addEventListener('DOMContentLoaded', function () {
     const searchBox = document.getElementById('searchBox');
     const filtroRol = document.getElementById('filtroRol');
     const ordenNombre = document.getElementById('ordenNombre');
-    const btnAplicarFiltro = document.getElementById('btnAplicarFiltro');
     const tbody = document.querySelector('#tablaUsuarios tbody');
 
     // Copia original de todas las filas
@@ -58,13 +42,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let filtradas = filasOriginales.filter(fila => {
             const textoFila = fila.textContent.toLowerCase();
-            const rolFila = fila.cells[0].textContent.toLowerCase();
+            const rolFila = fila.cells[0].textContent.toLowerCase(); // suponiendo que rol está en la primera columna
             const coincideBusqueda = textoFila.includes(textoBusqueda);
             const coincideRol = rolSeleccionado === "" || rolFila === rolSeleccionado;
             return coincideBusqueda && coincideRol;
         });
 
-        // Orden por nombre
+        // Ordenar por nombre (columna 1)
         const orden = ordenNombre.value;
         if (orden) {
             filtradas.sort((a, b) => {
@@ -76,43 +60,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
+        // Pintar de nuevo en la tabla
         tbody.innerHTML = '';
         filtradas.forEach(fila => tbody.appendChild(fila));
     }
 
     // Eventos
+    searchBox.addEventListener('input', aplicarFiltro);
     filtroRol.addEventListener('change', aplicarFiltro);
     ordenNombre.addEventListener('change', aplicarFiltro);
-
-    //modificar ussuario
-    document.addEventListener("DOMContentLoaded", function () {
-        const selectUsuario = document.getElementById("usuarioExistente");
-
-        selectUsuario.addEventListener("change", async function () {
-            const userId = this.value;
-            if (!userId) return; // si no selecciona nada, no hago nada
-
-            try {
-                const response = await fetch(`/Usuario/GetUsuario/${userId}`);
-                if (!response.ok) throw new Error("Error al obtener usuario");
-
-                const usuario = await response.json();
-
-                // autocompleto los campos
-                document.querySelector("[name='Nombre']").value = usuario.nombre || "";
-                document.querySelector("[name='Apellido']").value = usuario.apellido || "";
-                document.querySelector("[name='Password']").value = usuario.password || "";
-                document.querySelector("[name='Direccion']").value = usuario.direccion || "";
-                document.querySelector("[name='CaracteristicaTelefono']").value = usuario.caracteristicaTelefono || "";
-                document.querySelector("[name='NumeroTelefono']").value = usuario.numeroTelefono || "";
-                document.querySelector("[name='Localidad']").value = usuario.localidad || "";
-                document.querySelector("[name='RolUsuarioDescripcion']").value = usuario.rolUsuarioDescripcion || "";
-                document.querySelector("[name='FechaContratoIngreso']").value = usuario.fechaContratoIngreso?.split('T')[0] || "";
-
-            } catch (error) {
-                console.error(error);
-            }
-        });
-    });
-
-
+});
+    
