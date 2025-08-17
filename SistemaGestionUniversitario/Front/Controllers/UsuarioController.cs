@@ -38,33 +38,33 @@ namespace Front.Controllers
 
         // GET: /Usuario/GetUsuarioDNI/dni
         [Authorize(Roles = "Administrador")]
-        [HttpGet]
-        public async Task<IActionResult> GetUsuarioDNI(string dni)
+        [HttpGet("Usuario/GetByDni/{dni}")]
+        public async Task<IActionResult> GetByDni(string dni)
         {
-            try
-            {
-                UsuarioFront? usuario = await _httpClient.GetFromJsonAsync<UsuarioFront>($"Usuario/{dni}");
-                
-                if (usuario == null)
-                {
-                    TempData["Error"] = "Usuario inexistente o no encontrado.";
-                    return RedirectToAction("Index");
-                }
+            var usuario = await _httpClient.GetFromJsonAsync<ModificarUsuarioFront>($"Usuario/{dni}");
 
-                return View(usuario);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener usuario por DNI");
-                return RedirectToAction("GetUsuarios");
-            }
+            if (usuario == null)
+                return NotFound(new { mensaje = "Usuario no encontrado" });
+
+            return Json(usuario);  // devuelve en JSON todos los datos del usuario
         }
+
         // GET: /Usuario/CreateUsuario
         [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult CreateUsuario()
         {
             return View(); // Devuelve la vista con el formulario
+        }
+        // GET: /Usuario/UpdateUsuario
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public async Task<IActionResult> UpdateUsuario()
+        {
+            var usuarios = await _httpClient.GetFromJsonAsync<List<UsuarioFront>>("Usuario");
+
+            ViewBag.Usuarios = usuarios ?? new List<UsuarioFront>();
+            return View();
         }
 
 
