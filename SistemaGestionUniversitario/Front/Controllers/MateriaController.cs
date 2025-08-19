@@ -123,37 +123,36 @@ namespace Front.Controllers
         [Authorize(Roles = "Administrador")]
         [HttpDelete("{nombreMateria}")]
         public async Task<IActionResult> DeleteMateria(string nombreMateria)
-        {
+        {   
             try
             {
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"Materia/{nombreMateria}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
-                        TempData["Error"] = "No se encontró una materia con ese nombre.";
+                        return NotFound(new { message = "No se encontró una materia con ese nombre." });
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                     {
                         string error = await response.Content.ReadAsStringAsync();
-                        TempData["Error"] = $"Error de validación: {error}";
+                        return BadRequest(new { message = $"Error de validación: {error}" });
                     }
                     else
                     {
-                        TempData["Error"] = "Ocurrió un error inesperado al eliminar la materia.";
+                        return StatusCode((int)response.StatusCode, new { message = "Ocurrió un error inesperado al eliminar la materia." });
                     }
-
-                    return RedirectToAction("GetMaterias");
                 }
-                TempData["Success"] = "Materia eliminada correctamente.";
-                return RedirectToAction("GetMaterias");
+
+                return Ok(new { message = "Materia eliminada correctamente." });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al eliminar materia");
-                TempData["Error"] = "Ocurrió un error al eliminar la materia.";
-                return RedirectToAction("GetMaterias");
+                return StatusCode(500, new { message = "Ocurrió un error al eliminar la materia." });
             }
+            
         }
     }
 }

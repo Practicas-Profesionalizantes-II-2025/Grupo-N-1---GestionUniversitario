@@ -10,16 +10,27 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
 });
 
 // Eliminar materia con confirmación
-async function deleteMateria(nombre) {
-    if (confirm("¿Estás seguro que quieres eliminar la materia " + nombre + "?")) {
-        const response = await fetch(`/Materia/${nombre}`, {
-            method: "DELETE"
-        });
+async function deleteMateria(nombreMateria) {
+    if (confirm("¿Estás seguro que quieres eliminar la materia " + nombreMateria + "?")) {
+        try {
+            const response = await fetch(`/Materia/${encodeURIComponent(nombreMateria)}`, {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        if (response.ok) {
-            location.reload(); // recargar la tabla
-        } else {
-            alert("Error al eliminar la materia.");
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message || "Materia eliminada correctamente.");
+                location.reload(); // recargar la página
+            } else {
+                alert(result.message || "Error al eliminar la materia.");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Error de conexión al intentar eliminar la materia.");
         }
     }
 }
