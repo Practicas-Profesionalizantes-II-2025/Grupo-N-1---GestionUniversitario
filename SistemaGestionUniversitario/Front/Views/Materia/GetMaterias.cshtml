@@ -1,5 +1,49 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<Front.Models.Respuestas.MateriaFront>
+
 @{
+    ViewData["Title"] = "Materias";
 }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="input-group" style="max-width: 300px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+        <button class="btn btn-outline-secondary btn-sm ms-2" style="height:32px; padding:2px 10px;">
+            <i class="bi bi-funnel"></i> Filtro
+        </button>
+    </div>
+    <div>
+        <a href="@Url.Action("UpdateMateria", "Materia")" class="btn btn-success">Modificar</a>
+        <a href="@Url.Action("CreateMateria", "Materia")" class="btn btn-success">Crear</a>
+    </div>
+</div>
+
+<table class="table table-striped table-bordered align-middle">
+    <thead class="table-secondary">
+        <tr>
+            <th>Materia</th>
+            <th>Año</th>
+            <th>Modalidad</th>
+            <th style="width:100px;">Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="materiaTable">
+        @foreach (var materia in Model)
+        {
+            <tr>
+                <td>@materia.Nombre</td>
+                <td>@materia.Anio</td>
+                <td>@materia.Modalidad</td>
+                <td class="text-center">
+                    <a href="@Url.Action("GetMateriaNombre", "Materia", new { nombreMateria = materia.Nombre })" class="btn btn-sm btn-info">
+                        <i class="bi bi-info-circle"></i>
+                    </a>
+                    <button class="btn btn-sm btn-danger" onclick="deleteMateria('@materia.Nombre')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="/js/materias.js"></script>

@@ -51,36 +51,39 @@ body {
 #nombreAlumno {
     margin-right: 24px;
 }
+.homeContainer {
+    display: flex;
+    flex-direction: column; /* Logo arriba, texto abajo */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    height: calc(100vh - 60px); /* Ajustá restando el alto de tu menú */
+}
+
 #imgHome {
-    margin: 0;
-    padding: 0;
-    object-fit: cover;
-    display: block;
-    position: absolute;
-    top:40%;
-    left: 40%;
+    max-width: 300px; /* Limita el ancho del logo */
+    height: auto;
+    margin-bottom: 20px; /* Espacio entre logo y texto */
 }
+
 #bHome {
-    position: absolute;
-    top: 65%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     color: black;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
     letter-spacing: 20px;
-    font-weight:600;
-    
+    font-weight: 600;
+    text-align: center;
+    position: relative;
 }
+
     #bHome::after {
         content: "";
         position: absolute;
-        bottom: 0;
+        bottom: -10px;
         left: 50%;
         transform: translateX(-50%);
         width: 25%;
         height: 4px;
-        background: linear-gradient(90deg, black, #a6a6a6, black); /* Degradado dorado */
+        background: linear-gradient(90deg, black, #a6a6a6, black);
         border-radius: 2px;
     }
+
+
+
