@@ -121,9 +121,9 @@ namespace Front.Controllers
 
         // DELETE: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
-        [HttpDelete("{nombreMateria}")]
+        [HttpDelete("Materia/{nombreMateria}")]
         public async Task<IActionResult> DeleteMateria(string nombreMateria)
-        {   
+        {
             try
             {
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"Materia/{nombreMateria}");
@@ -132,27 +132,27 @@ namespace Front.Controllers
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
-                        return NotFound(new { message = "No se encontró una materia con ese nombre." });
+                        return NotFound("No se encontró una materia con ese nombre.");
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                     {
                         string error = await response.Content.ReadAsStringAsync();
-                        return BadRequest(new { message = $"Error de validación: {error}" });
+                        return BadRequest($"Error de validación: {error}");
                     }
                     else
                     {
-                        return StatusCode((int)response.StatusCode, new { message = "Ocurrió un error inesperado al eliminar la materia." });
+                        return StatusCode((int)response.StatusCode, "Ocurrió un error inesperado al eliminar la materia.");
                     }
                 }
 
                 return Ok(new { message = "Materia eliminada correctamente." });
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al eliminar materia");
-                return StatusCode(500, new { message = "Ocurrió un error al eliminar la materia." });
+                return StatusCode(500, "Ocurrió un error al eliminar la materia.");
             }
-            
         }
     }
 }

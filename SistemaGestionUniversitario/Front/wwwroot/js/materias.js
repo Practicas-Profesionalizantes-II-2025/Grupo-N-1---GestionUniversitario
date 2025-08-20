@@ -12,25 +12,15 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
 // Eliminar materia con confirmación
 async function deleteMateria(nombreMateria) {
     if (confirm("¿Estás seguro que quieres eliminar la materia " + nombreMateria + "?")) {
-        try {
-            const response = await fetch(`/Materia/${encodeURIComponent(nombreMateria)}`, {
-                method: "DELETE",
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+        const response = await fetch(`/Materia/${nombreMateria}`, {method: "DELETE"});
 
-            const result = await response.json();
-
-            if (response.ok) {
-                alert(result.message || "Materia eliminada correctamente.");
-                location.reload(); // recargar la página
-            } else {
-                alert(result.message || "Error al eliminar la materia.");
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert("Error de conexión al intentar eliminar la materia.");
+        if (response.ok) {
+            const msg = await response.text();
+            alert(msg);
+            location.reload();
+        } else {
+            const error = await response.text();
+            alert("Error al eliminar la materia: " + error);
         }
     }
 }
