@@ -140,8 +140,8 @@ namespace Logica.Implementations
                 throw new InvalidOperationException("No se encontró la materia.");
             }
 
-            // 2. Buscar inscripciones de esa materia
-            List<Inscripcion> inscripciones = (await _inscripcionRepository.FindByConditionAsync(i => i.IdMateria == materia.ID)).ToList();
+            // 2. Buscar inscripciones "EN CURSO" de esa materia
+            List<Inscripcion> inscripciones = (await _inscripcionRepository.FindByConditionAsync(i => i.IdMateria == materia.ID && i.Estado == false)).ToList();
             if (!inscripciones.Any())
                 return new List<AsistenciaDTO>();
 
@@ -162,6 +162,57 @@ namespace Logica.Implementations
                 Alumno? alumno = (await _alumnoRepository.FindByConditionAsync(a => a.ID == inscripcion.IdAlumno)).FirstOrDefault();
                 if (alumno == null || alumno.Usuario == null)
                     continue;
+
+                // Crear DTO
+                AsistenciaDTO asistenciaDTO = new AsistenciaDTO
+                {
+                    ID = asistencia.ID,
+                    DniAlumno = alumno.Usuario.DNI,
+                    NombreMateria = materia.Nombre,
+                    Estado = asistencia.Estado,
+                    Fecha = asistencia.Fecha
+                };
+
+                resultado.Add(asistenciaDTO);
+            }
+
+            return resultado;
+        }
+        public async Task<List<AsistenciaDTO>> ObtenerInasistenciasPorAlumno(string dni)
+        {
+            // 1. Buscar la materia
+            Alumno? alumno = (await _alumnoRepository.FindByConditionAsync(a => a.Usuario != null && a.Usuario.DNI == dni)).FirstOrDefault();
+            if (alumno == null)
+            {
+                throw new InvalidOperationException("No se encontró el alumno con el DNI ingresado.");
+            }
+
+            // 2. Buscar inscripciones "EN CURSO" de esa materia
+            List<Inscripcion> inscripciones = (await _inscripcionRepository.FindByConditionAsync(i => i.IdAlumno == alumno.ID && i.Estado == false)).ToList();
+            if (!inscripciones.Any())
+            {
+                return new List<AsistenciaDTO>();
+            }
+
+            // 3. Obtener todos los IDs de inscripciones
+            var idsInscripciones = inscripciones.Select(i => i.ID).ToHashSet();
+
+            // 4. Buscar todas las asistencias que correspondan a esas inscripciones
+            var asistencias = (await _asistenciaRepository.FindAllAsync()).Where(a => idsInscripciones.Contains(a.IdInscripcion) && a.Estado == false).ToList();
+
+            List<AsistenciaDTO> resultado = new();
+
+            foreach (Asistencia asistencia in asistencias)
+            {
+                // Obtener datos relacionados
+
+                Inscripcion inscripcion = inscripciones.First(i => i.ID == asistencia.IdInscripcion);
+
+                Materia? materia = (await _materiaRepository.FindByConditionAsync(a => a.ID == inscripcion.IdMateria)).FirstOrDefault();
+                if (materia == null)
+                {
+                    throw new InvalidOperationException($"No se encontró la materia con ID {inscripcion.IdMateria} para la inscripción {inscripcion.ID}.");
+                }
 
                 // Crear DTO
                 AsistenciaDTO asistenciaDTO = new AsistenciaDTO

@@ -1,8 +1,10 @@
 ﻿using Datos.Repositories.Contracts;
+using Datos.Repositories.Implementations;
 using Entidades.DTOs.Respuestas;
 using Entidades.Entities;
 using Logica;
 using Logica.Contracts;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Negocio.Implementations
 {
@@ -12,13 +14,15 @@ namespace Negocio.Implementations
         IProfesorRepository _profesorRepository;
         IDiaHorarioRepository _diaHorarioRepository;
         IDiaHorarioLogic _diaHorarioLogic;
+        IProfesorMateriaRepository _profesorMateriaRepository;
 
-        public MateriaLogic(IMateriaRepository materiaRepository, IProfesorRepository profesorRepository, IDiaHorarioRepository diaHorarioRepository, IDiaHorarioLogic diaHorarioLogic)
+        public MateriaLogic(IMateriaRepository materiaRepository, IProfesorRepository profesorRepository, IDiaHorarioRepository diaHorarioRepository, IDiaHorarioLogic diaHorarioLogic, IProfesorMateriaRepository profesorMateriaRepository)
         {
             _materiaRepository = materiaRepository;
             _profesorRepository = profesorRepository;
             _diaHorarioRepository = diaHorarioRepository;
             _diaHorarioLogic = diaHorarioLogic;
+            _profesorMateriaRepository = profesorMateriaRepository;
         }
         
         public async Task AltaMateria(string nombre, List<int> listaProfesoresID, List<int> listaDiasHorariosID, string modalidad, string anio)
@@ -298,6 +302,50 @@ namespace Negocio.Implementations
             };
 
             return materiaDTO;
+        }
+        public async Task<List<MateriaDTO>> ObtenerMateriasDNIProfesor(string dni)
+        {
+            Profesor? profesor = (await _profesorRepository.FindByConditionAsync(t => t.Usuario.DNI == dni)).FirstOrDefault();
+            
+            if (profesor == null)
+            {
+                throw new ArgumentException("No se encontró un profesor con el DNI ingresado.");
+            }
+
+            List<ProfesorMateria> profesorMaterias = (await _profesorMateriaRepository.FindByConditionAsync(t => t.IdProfesor == profesor.ID)).ToList();
+
+            if (!profesorMaterias.Any())
+            {
+                throw new ArgumentException("El profesor con el DNI ingresado no está vinculado a ninguna materia.");
+            }
+
+            var idsMaterias = profesorMaterias.Select(pm => pm.IdMateria).ToHashSet();
+
+            List<Materia> listaMaterias = (await _materiaRepository.FindByConditionAsync(m => idsMaterias.Contains(m.ID))).ToList();
+
+            List<MateriaDTO> listaMateriasDTO = new List<MateriaDTO>();
+            foreach(Materia materia in listaMaterias)
+            {
+                List<string> listaDescripcionDiasHorarios = new List<string>();
+                foreach (DiaHorario diaHorario in materia.DiaHorario)
+                {
+                    listaDescripcionDiasHorarios.Add(await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorDiaHorario(diaHorario));
+                }
+
+                MateriaDTO materiaDTO = new MateriaDTO()
+                {
+                    ID = materia.ID,
+                    Nombre = materia.Nombre,
+                    Anio = materia.Anio,
+                    Modalidad = materia.Modalidad,
+                    NombresProfesores = materia.Profesores.Select(p => $"{p.Usuario.Nombre} {p.Usuario.Apellido}").ToList(),
+                    DescripcionDiasHorarios = listaDescripcionDiasHorarios
+                };
+
+                listaMateriasDTO.Add(materiaDTO);
+            }
+
+            return listaMateriasDTO;
         }
     }
 }

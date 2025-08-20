@@ -68,13 +68,23 @@
                     <td>@usuario.Nombre @usuario.Apellido</td>
                     <td>@usuario.DNI</td>
                     <td class="acciones">
-                        
-                        <!-- botones de informacion y borrar -->
-                        <button class="btn btn-sm btn-info">            
+
+                        <!-- Botón informacion -->
+                        <button type="button"
+                                class="btn btn-sm btn-info"
+                                data-bs-toggle="modal"
+                                data-bs-target="#informacionUsuario"
+                                data-dni="@usuario.DNI"
+                                data-nombre="@usuario.Nombre"
+                                data-apellido="@usuario.Apellido"
+                                data-localidad="@usuario.Localidad"
+                                data-direccion="@usuario.Direccion"
+                                data-telefono="@usuario.CaracteristicaTelefono @usuario.NumeroTelefono"
+                                data-rol="@usuario.RolUsuarioDescripcion">
                             <i class="bi bi-info-circle"></i>
                         </button>
 
-                        <!-- Botón que abre la confirmación -->
+                        <!-- Botón borrar -->
                         <button type="button"
                                 class="btn btn-sm btn-danger"
                                 data-bs-toggle="modal"
@@ -91,7 +101,7 @@
        </table>
 </div>
 
-<!-- Confirmación -->
+<!-- ELIMINAR -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -114,6 +124,25 @@
                     <button type="submit" class="btn btn-danger" id="btnAceptar" disabled>Aceptar</button>
                 </form>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- INFORMACION -->
+<div class="modal fade" id="informacionUsuario" tabindex="-1" aria-labelledby="infoUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoUsuarioLabel">Información del Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Usuario (DNI):</strong> <span id="infoDni"></span></p>
+                <p><strong>Localidad:</strong> <span id="infoLocalidad"></span></p>
+                <p><strong>Dirección:</strong> <span id="infoDireccion"></span></p>
+                <p><strong>Teléfono:</strong> <span id="infoTelefono"></span></p>
+                <p><strong>Rol:</strong> <span id="infoRol"></span></p>
             </div>
         </div>
     </div>

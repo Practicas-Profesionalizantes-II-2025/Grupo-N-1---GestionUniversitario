@@ -43,7 +43,8 @@ namespace Logica.Implementations
             Inscripcion inscripcionNueva = new Inscripcion()
             {
                 IdAlumno = alumnoExistente.ID,
-                IdMateria = materiaExistente.ID
+                IdMateria = materiaExistente.ID,
+                Estado = false
             };
 
             await _inscripcionRepository.AddAsync(inscripcionNueva);
@@ -85,12 +86,137 @@ namespace Logica.Implementations
                     return null;
                 }
 
-                List<InscripcionDTO> listaInscripcionesDTO = listaInscripciones.Select(t => new InscripcionDTO
+                List<InscripcionDTO> listaInscripcionesDTO = new List<InscripcionDTO>();
+                foreach (Inscripcion inscripcion in listaInscripciones)
                 {
-                    ID = t.ID,
-                    IdAlumno = t.IdAlumno,
-                    IdMateria = t.IdMateria
-                }).ToList();
+                    Alumno? alumnoExistente = (await _alumnoRepository.FindByConditionAsync(p => p.Usuario.ID == inscripcion.IdAlumno)).FirstOrDefault();
+
+                    if (alumnoExistente == null)
+                    {
+                        throw new ArgumentNullException("ID de alumno invalido.");
+                    }
+
+                    Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(p => p.ID == inscripcion.IdMateria)).FirstOrDefault();
+                    
+                    if (materiaExistente == null)
+                    {
+                        throw new ArgumentNullException("ID de materia invalido.");
+                    }
+
+                    InscripcionDTO inscripcionDTO = new InscripcionDTO()
+                    {
+                        ID = inscripcion.ID,
+                        IdAlumno = alumnoExistente.ID,
+                        NombreAlumno = alumnoExistente.Usuario.Nombre,
+                        ApellidoAlumno = alumnoExistente.Usuario.Apellido,
+                        DNIAlumno = alumnoExistente.Usuario.DNI,
+                        Estado = inscripcion.Estado ? "Aprobado" : "En Curso",
+                        IdMateria = materiaExistente.ID,
+                        NombreMateria = materiaExistente.Nombre
+                    };
+
+                    listaInscripcionesDTO.Add(inscripcionDTO);
+                }
+
+                return listaInscripcionesDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex}");
+            };
+        }
+        public async Task<List<InscripcionDTO>> ObtenerInscripcionesMateria(string nombreMateria)
+        {
+            try
+            {
+                Materia? materiaFiltro = (await _materiaRepository.FindByConditionAsync(p => p.Nombre == nombreMateria)).FirstOrDefault();
+
+                if (materiaFiltro == null)
+                {
+                    throw new ArgumentNullException("El nombre ingresado no pertenece a ninguna materia existente.");
+                }
+
+                List<Inscripcion> listaInscripciones = (await _inscripcionRepository.FindByConditionAsync(p => p.IdMateria == materiaFiltro.ID)).ToList();
+
+                if (listaInscripciones == null)
+                {
+                    return new List<InscripcionDTO>();
+                }
+
+                List<InscripcionDTO> listaInscripcionesDTO = new List<InscripcionDTO>();
+                foreach (Inscripcion inscripcion in listaInscripciones)
+                {
+                    Alumno? alumnoExistente = (await _alumnoRepository.FindByConditionAsync(p => p.ID == inscripcion.IdAlumno)).FirstOrDefault();
+
+                    if (alumnoExistente == null)
+                    {
+                        throw new ArgumentNullException("ID de alumno invalido.");
+                    }
+
+                    InscripcionDTO inscripcionDTO = new InscripcionDTO()
+                    {
+                        ID = inscripcion.ID,
+                        IdAlumno = alumnoExistente.ID,
+                        NombreAlumno = alumnoExistente.Usuario.Nombre,
+                        ApellidoAlumno = alumnoExistente.Usuario.Apellido,
+                        DNIAlumno = alumnoExistente.Usuario.DNI,
+                        Estado = inscripcion.Estado ? "Aprobado" : "En Curso",
+                        IdMateria = materiaFiltro.ID,
+                        NombreMateria = materiaFiltro.Nombre
+                    };
+
+                    listaInscripcionesDTO.Add(inscripcionDTO);
+                }
+
+                return listaInscripcionesDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex}");
+            };
+        }
+        public async Task<List<InscripcionDTO>> ObtenerInscripcionesDNI(string dni)
+        {
+            try
+            {
+                Alumno? alumnoFiltro = (await _alumnoRepository.FindByConditionAsync(p => p.Usuario.DNI == dni)).FirstOrDefault();
+
+                if (alumnoFiltro == null)
+                {
+                    throw new ArgumentNullException("El DNI ingresado no pertenece a ningun alumno existente.");
+                }
+
+                List<Inscripcion> listaInscripciones = (await _inscripcionRepository.FindByConditionAsync(p => p.IdAlumno == alumnoFiltro.ID)).ToList();
+
+                if (listaInscripciones == null)
+                {
+                    return new List<InscripcionDTO>();
+                }
+
+                List<InscripcionDTO> listaInscripcionesDTO = new List<InscripcionDTO>();
+                foreach (Inscripcion inscripcion in listaInscripciones)
+                {
+                    Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(p => p.ID == inscripcion.IdMateria)).FirstOrDefault();
+
+                    if (materiaExistente == null)
+                    {
+                        throw new ArgumentNullException("ID de materia invalido.");
+                    }
+
+                    InscripcionDTO inscripcionDTO = new InscripcionDTO()
+                    {
+                        ID = inscripcion.ID,
+                        IdAlumno = alumnoFiltro.ID,
+                        NombreAlumno = alumnoFiltro.Usuario.Nombre,
+                        ApellidoAlumno = alumnoFiltro.Usuario.Apellido,
+                        DNIAlumno = alumnoFiltro.Usuario.DNI,
+                        Estado = inscripcion.Estado ? "Aprobado" : "En Curso",
+                        IdMateria = materiaExistente.ID,
+                        NombreMateria = materiaExistente.Nombre
+                    };
+
+                    listaInscripcionesDTO.Add(inscripcionDTO);
+                }
 
                 return listaInscripcionesDTO;
             }

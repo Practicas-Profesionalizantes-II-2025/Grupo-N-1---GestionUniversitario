@@ -9,5 +9,6 @@ namespace Logica.Contracts
         Task<MateriaDTO> ActualizacionMateria(string nombre, List<int> listaProfesoresID, List<int> listaDiasHorariosID);
         Task<List<MateriaDTO>> ObtenerMaterias();
         Task<MateriaDTO> ObtenerMateriaNombre(string nombre);
+        Task<List<MateriaDTO>> ObtenerMateriasDNIProfesor(string dni);
     }
 }

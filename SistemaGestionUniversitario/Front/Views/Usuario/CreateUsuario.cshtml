@@ -58,14 +58,11 @@
                 <span asp-validation-for="NumeroTelefono" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="RolUsuarioDescripcion" class="form-label">Rol *</label>
-                <select asp-for="RolUsuarioDescripcion" class="form-select required-field">
-                    <option value="">Seleccione...</option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Alumno">Alumno</option>
-                    <option value="Profesor">Profesor</option>
-                </select>
-                <span asp-validation-for="RolUsuarioDescripcion" class="text-danger"></span>
+            <label asp-for="RolUsuarioDescripcion" class="form-label">Rol *</label>
+            <select asp-for="RolUsuarioDescripcion" asp-items="ViewBag.Roles" class="form-select required-field">
+                <option value="">Seleccione...</option>
+            </select>
+            <span asp-validation-for="RolUsuarioDescripcion" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="FechaContratoIngreso" class="form-label">Fecha ingreso *</label>
@@ -80,5 +77,6 @@
         <a asp-action="GetUsuarios" class="btn btn-secondary">Cancelar</a>
     </div>
 </form>
+
 
 

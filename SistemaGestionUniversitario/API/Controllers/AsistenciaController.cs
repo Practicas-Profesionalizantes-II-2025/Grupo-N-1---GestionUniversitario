@@ -18,12 +18,33 @@ namespace API.Controllers
             _asistenciaLogic = asistenciaLogic;
         }
 
-        [HttpGet("{nombreMateria}")]
+        [HttpGet("NombreMateria/{nombreMateria}")]
         public async Task<IActionResult> ObtenerAsistenciasPorMateria(string nombreMateria)
         {
             try
             {
                 List<AsistenciaDTO> asistenciaDTO = await _asistenciaLogic.ObtenerAsistenciasPorMateria(nombreMateria);
+
+                if (asistenciaDTO.Count == 0)
+                {
+                    return NoContent();
+                }
+
+                return Ok(asistenciaDTO);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        [HttpGet("DNI/{dni}")]
+        public async Task<IActionResult> ObtenerInasistenciasPorAlumno(string dni)
+        {
+            try
+            {
+                List<AsistenciaDTO> asistenciaDTO = await _asistenciaLogic.ObtenerInasistenciasPorAlumno(dni);
 
                 if (asistenciaDTO.Count == 0)
                 {

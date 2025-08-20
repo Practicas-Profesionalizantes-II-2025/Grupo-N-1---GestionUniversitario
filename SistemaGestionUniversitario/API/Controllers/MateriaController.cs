@@ -31,8 +31,8 @@ namespace API.Controllers
             return Ok(materiasDTO);
         }
 
-        [HttpGet("{nombreMateria}")]
-        public async Task<IActionResult> GetMaterias(string nombreMateria)
+        [HttpGet("NombreMateria/{nombreMateria}")]
+        public async Task<IActionResult> GetMateria(string nombreMateria)
         {
             try
             {
@@ -49,6 +49,26 @@ namespace API.Controllers
             {
                 return BadRequest(new { mensaje = ex.Message });
             }     
+        }
+
+        [HttpGet("DNIProfesor/{nombreMateria}")]
+        public async Task<IActionResult> GetMateriasDNIProfesor(string dni)
+        {
+            try
+            {
+                List<MateriaDTO> materiasDTO = await _materiaLogic.ObtenerMateriasDNIProfesor(dni);
+
+                if (materiasDTO == null)
+                {
+                    return NoContent();
+                }
+
+                return Ok(materiasDTO);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
 
         [HttpPost]

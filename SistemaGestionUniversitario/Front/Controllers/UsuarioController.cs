@@ -3,6 +3,7 @@ using Front.Models.Modificar;
 using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.Json;
 
 namespace Front.Controllers
@@ -12,7 +13,6 @@ namespace Front.Controllers
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<UsuarioController> _logger;
-
         public UsuarioController(IHttpClientFactory httpClientFactory, ILogger<UsuarioController> logger)
         {
             _httpClient = httpClientFactory.CreateClient("ApiPrincipal");
@@ -52,9 +52,12 @@ namespace Front.Controllers
         // GET: /Usuario/CreateUsuario
         [Authorize(Roles = "Administrador")]
         [HttpGet]
-        public IActionResult CreateUsuario()
+        public async Task<IActionResult> CreateUsuario()
         {
-            return View(); // Devuelve la vista con el formulario
+            List<RolUsuarioFront>? rolesUsuario = await _httpClient.GetFromJsonAsync<List<RolUsuarioFront>>("RolUsuario");
+
+            ViewBag.Roles = new SelectList(rolesUsuario, "Descripcion", "Descripcion");
+            return View();
         }
         // GET: /Usuario/UpdateUsuario
         [Authorize(Roles = "Administrador")]

@@ -8,5 +8,6 @@ namespace Logica.Contracts
         Task<AsistenciaDTO> ActualizarAsistencia(string dniAlumno, string nombreMateria, DateTime fecha, bool estado);
         Task EliminarAsistencia(string dniAlumno, string nombreMateria, DateTime fecha);
         Task<List<AsistenciaDTO>> ObtenerAsistenciasPorMateria(string nombreMateria);
+        Task<List<AsistenciaDTO>> ObtenerInasistenciasPorAlumno(string dni);
     }
 }
