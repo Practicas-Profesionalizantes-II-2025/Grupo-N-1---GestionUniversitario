@@ -34,26 +34,25 @@ namespace Front.Controllers
         }
 
         // GET: /Materia/GetMateriaNombre/nombreMateria
-        [HttpGet("{nombreMateria}")]
-        public async Task<IActionResult> GetMateriaNombre(string nombreMateria)
+        [HttpGet("Materia/GetMateriaJson/{nombreMateria}")]
+        public async Task<IActionResult> GetMateriaJson(string nombreMateria)
         {
             try
             {
                 MateriaFront? materia = await _httpClient.GetFromJsonAsync<MateriaFront>($"Materia/{nombreMateria}");
-
                 if (materia == null)
-                {
-                    TempData["Error"] = "Materia inexistente o no encontrada.";
-                    return RedirectToAction("GetMaterias");
-                }
-                return View(materia);
+                    return NotFound(new { message = "Materia inexistente o no encontrada." });
+
+                return Ok(materia);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener materia por nombre");
-                return RedirectToAction("GetMaterias");
+                return StatusCode(500, new { message = "Error interno al obtener materia." });
             }
         }
+
+
 
         // POST: /Materia/PostMateria
         [Authorize(Roles = "Administrador")]

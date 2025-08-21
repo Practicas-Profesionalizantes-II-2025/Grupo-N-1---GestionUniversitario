@@ -24,3 +24,27 @@ async function deleteMateria(nombreMateria) {
         }
     }
 }
+
+// Mas Información
+
+async function infoMateria(nombreMateria) {
+    try {
+        const response = await fetch(`/Materia/GetMateriaJson/${nombreMateria}`);
+        if (response.ok) {
+            const materia = await response.json();
+            document.getElementById("modalHorarios").textContent = materia.descripcionDiasHorarios?.join(", ") || "No asignado";
+            document.getElementById("modalProfesores").textContent = materia.nombresProfesores?.join(", ") || "No asignado";
+            document.getElementById("modalAnio").textContent = materia.anio;
+            document.getElementById("modalModalidad").textContent = materia.modalidad;
+            const modal = new bootstrap.Modal(document.getElementById('materiaModal'));
+            modal.show();
+        } else {
+            const error = await response.text();
+            alert("Error: " + error);
+        }
+    } catch (err) {
+        console.error("Error:", err);
+        alert("Error de conexión.");
+    }
+}
+

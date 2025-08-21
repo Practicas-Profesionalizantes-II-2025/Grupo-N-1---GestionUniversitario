@@ -35,9 +35,10 @@
                 <td>@materia.Anio</td>
                 <td>@materia.Modalidad</td>
                 <td class="text-center">
-                    <a href="@Url.Action("GetMateriaNombre", "Materia", new { nombreMateria = materia.Nombre })" class="btn btn-sm btn-info">
+                    <button type="button" class="btn btn-sm btn-info" onclick="infoMateria('@materia.Nombre')">
                         <i class="bi bi-info-circle"></i>
-                    </a>
+                    </button>
+
                     <button class="btn btn-sm btn-danger" onclick="deleteMateria('@materia.Nombre')">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -46,4 +47,23 @@
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="materiaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNombre"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Horarios:</strong> <span id="modalHorarios"></span></p>
+                <p><strong>Profesor/es:</strong> <span id="modalProfesores"></span></p>
+                <p><strong>Año:</strong> <span id="modalAnio"></span></p>
+                <p><strong>Modalidad:</strong> <span id="modalModalidad"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script src="/js/materias.js"></script>
