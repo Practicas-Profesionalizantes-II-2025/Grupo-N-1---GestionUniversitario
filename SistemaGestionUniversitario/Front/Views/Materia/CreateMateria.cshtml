@@ -1,0 +1,54 @@
+﻿@model Front.Models.Crear.CrearMateriaFront
+
+@{
+    ViewData["Title"] = "Crear Materia";
+}
+
+<h2>Crear Materia</h2>
+
+<form asp-action="CreateMateria" method="post">
+
+    <!-- Nombre -->
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <!-- Año -->
+    <div class="mb-3">
+        <label asp-for="Anio" class="form-label"></label>
+        <input asp-for="Anio" type="number" class="form-control" />
+        <span asp-validation-for="Anio" class="text-danger"></span>
+    </div>
+
+    <!-- Modalidad -->
+    <div class="mb-3">
+        <label asp-for="Modalidad" class="form-label"></label>
+        <input asp-for="Modalidad" class="form-control" />
+        <span asp-validation-for="Modalidad" class="text-danger"></span>
+    </div>
+
+    <!-- Profesores -->
+    <div class="mb-3">
+        <label for="Profesores" class="form-label">Profesor/es</label>
+        <select asp-for="ProfesoresIDs" class="form-select" multiple asp-items="@(new SelectList(ViewBag.Profesores, "Id", "Nombre"))"></select>
+        <span asp-validation-for="ProfesoresIDs" class="text-danger"></span>
+    </div>
+
+    <!-- Dias y Horarios -->
+    <div class="mb-3">
+        <label for="DiasHorarios" class="form-label">Días y Horarios</label>
+        <select asp-for="DiasHorariosIDs" class="form-select" multiple asp-items="@(new SelectList(ViewBag.DiasHorarios, "Id", "Descripcion"))"></select>
+        <span asp-validation-for="DiasHorariosIDs" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Crear</button>
+    <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

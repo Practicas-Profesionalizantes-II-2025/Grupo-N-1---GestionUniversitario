@@ -153,5 +153,25 @@ namespace Front.Controllers
                 return StatusCode(500, "Ocurrió un error al eliminar la materia.");
             }
         }
+        // GET: Materia/CreateMateria
+        [HttpGet]
+        public IActionResult CreateMateria()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CargaProfesoresDiaHorarios()
+        {
+            var profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor");
+            var diasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario");
+
+            ViewBag.Profesores = profesores ?? new List<ProfesorFront>();
+            ViewBag.DiasHorarios = diasHorarios ?? new List<DiaHorarioFront>();
+
+            return View();
+        }
+
+
     }
 }
