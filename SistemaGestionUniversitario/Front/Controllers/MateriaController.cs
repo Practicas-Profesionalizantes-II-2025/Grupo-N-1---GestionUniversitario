@@ -54,31 +54,55 @@ namespace Front.Controllers
 
 
 
-        // POST: /Materia/PostMateria
+        
         [Authorize(Roles = "Administrador")]
-        [HttpPost]
-        public async Task<IActionResult> CreateMateria(CrearMateriaFront materia)
+        [HttpGet]
+        public async Task<IActionResult> CreateMateria()
         {
-            try
+            var vm = new CrearMateriaFront
             {
-                HttpResponseMessage response = await _httpClient.PostAsJsonAsync("Materia", materia);
+                Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new(),
+                DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new()
+            };
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    string error = await response.Content.ReadAsStringAsync();
-                    ModelState.AddModelError("", error);
-                    return View(materia);
-                }
-
-                TempData["Success"] = "Materia creado correctamente.";
-                return RedirectToAction("GetMaterias");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear materia");
-                return View(materia);
-            }
+            return View(vm);
         }
+        // POST: /Materia/PostMateria
+        [HttpPost]
+        public async Task<IActionResult> CreateMateria(CrearMateriaFront model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Volver a cargar listas si hay error
+                model.Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new();
+                model.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
+                return View(model);
+            }
+
+            var materia = new CrearMateriaFront
+            {
+                Nombre = model.Nombre,
+                Anio = model.Anio,
+                Modalidad = model.Modalidad,
+                ProfesoresIDs = model.ProfesoresIDs,
+                DiasHorariosIDs = model.DiasHorariosIDs
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("Materia", materia);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string error = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError("", error);
+                model.Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new();
+                model.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
+                return View(model);
+            }
+
+            TempData["Success"] = "Materia creada correctamente.";
+            return RedirectToAction("GetMaterias");
+        }
+
 
         // PUT: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
@@ -153,24 +177,7 @@ namespace Front.Controllers
                 return StatusCode(500, "Ocurrió un error al eliminar la materia.");
             }
         }
-        // GET: Materia/CreateMateria
-        [HttpGet]
-        public IActionResult CreateMateria()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CargaProfesoresDiaHorarios()
-        {
-            var profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor");
-            var diasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario");
-
-            ViewBag.Profesores = profesores ?? new List<ProfesorFront>();
-            ViewBag.DiasHorarios = diasHorarios ?? new List<DiaHorarioFront>();
-
-            return View();
-        }
+        
 
 
     }
