@@ -52,9 +52,6 @@ namespace Front.Controllers
             }
         }
 
-
-
-        
         [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<IActionResult> CreateMateria()
@@ -67,19 +64,20 @@ namespace Front.Controllers
 
             return View(vm);
         }
-        // POST: /Materia/PostMateria
+
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> CreateMateria(CrearMateriaFront model)
         {
             if (!ModelState.IsValid)
             {
-                // Volver a cargar listas si hay error
+                // Volvemos a cargar las listas en caso de error
                 model.Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new();
                 model.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
                 return View(model);
             }
 
-            var materia = new CrearMateriaFront
+            var materia = new
             {
                 Nombre = model.Nombre,
                 Anio = model.Anio,
@@ -94,6 +92,7 @@ namespace Front.Controllers
             {
                 string error = await response.Content.ReadAsStringAsync();
                 ModelState.AddModelError("", error);
+
                 model.Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new();
                 model.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
                 return View(model);

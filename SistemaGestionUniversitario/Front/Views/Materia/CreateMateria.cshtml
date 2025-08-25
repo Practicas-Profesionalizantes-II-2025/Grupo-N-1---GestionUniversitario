@@ -10,26 +10,34 @@
     <div class="mb-3">
         <label asp-for="Nombre" class="form-label"></label>
         <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Anio" class="form-label"></label>
         <input asp-for="Anio" type="number" class="form-control" />
+        <span asp-validation-for="Anio" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Modalidad" class="form-label"></label>
         <input asp-for="Modalidad" class="form-control" />
+        <span asp-validation-for="Modalidad" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label>Profesores</label>
         <select asp-for="ProfesoresIDs" class="form-select" multiple
-                asp-items="@(new SelectList(Model.Profesores, "Id", "Nombre"))">
+                asp-items="@(new SelectList(Model.Profesores, "ID", "NombreCompleto"))">
         </select>
     </div>
 
-
+    <div class="mb-3">
+        <label>Días y Horarios</label>
+        <select asp-for="DiasHorariosIDs" class="form-select" multiple
+                asp-items="@(new SelectList(Model.DiasHorarios.Select(d => new { d.ID, Descripcion = d.DescripcionDia + " - " + d.DescripcionHorario }), "ID", "Descripcion"))">
+        </select>
+    </div>
 
     <button type="submit" class="btn btn-primary">Aceptar</button>
     <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
