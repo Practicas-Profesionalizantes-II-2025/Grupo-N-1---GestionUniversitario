@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Front.Models.Respuestas.MateriaFront>
+
+<!-- Validacion Roles -->
+@{
+    ViewData["Plan de Estudios"] = "Plan de Estudios";
+}
+
+<div>
+    <table class="tablas" id="tablaMaterias">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nombre)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Anio)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Modalidad)
+                </th>
+                <th>
+                    Horarios
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var materia in Model)
+            {
+                <tr>
+                    <td>@materia.Nombre</td>
+                    <td style="text-align:center">@materia.Anio</td>
+                    <td style="text-align:center">@materia.Modalidad</td>
+                    <td style="text-align:center">
+                        @Html.Raw(string.Join("<br/>", materia.DescripcionDiasHorarios))
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

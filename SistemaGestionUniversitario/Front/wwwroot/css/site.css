@@ -86,24 +86,29 @@ body {
     }
 
 /*estilo de la tabla */
-.tabla-usuarios {
+.tablas {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif; 
     font-size: 14px;
 }
-.tabla-usuarios th,
-.tabla-usuarios td {
+
+.tablas th{
+    text-align: center;
+}
+
+.tablas th,
+.tablas td {
     border: 1px solid #ccc;
     padding: 8px 12px;
 }
 
-.tabla-usuarios thead {
+.tablas thead {
     background-color: #f2f2f2;
     font-weight: bold;
 }
 
-.tabla-usuarios td.acciones {
+.tablas td.acciones {
     text-align: center;
     white-space: nowrap;
 }
@@ -121,5 +126,3 @@ body {
 .acciones .btn-danger:hover {
     color: red;
 }
-
-
