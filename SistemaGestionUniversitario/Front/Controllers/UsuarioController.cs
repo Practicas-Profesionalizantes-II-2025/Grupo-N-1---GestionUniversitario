@@ -4,6 +4,7 @@ using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace Front.Controllers
@@ -47,6 +48,7 @@ namespace Front.Controllers
                 return Content($"Error al obtener usuarios: {ex.Message}\n\n{ex.StackTrace}");
             }
         }
+        
         private async Task<List<SelectListItem>> ObtenerRolesParaVistaAsync()
         {
             try
@@ -87,9 +89,36 @@ namespace Front.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener usuario por DNI");
-                return RedirectToAction("GetUsuarios");
+                return RedirectToAction("Index");
             }
         }
+
+        // GET: /Usuario/GetUsuarioDNI/dni
+        [Authorize(Roles = "Administrador, Alumno, Profesor")]
+        [HttpGet]
+        public async Task<IActionResult> GetUsuarioDNIConfiguracion()
+        {
+            try
+            {
+                string? dniUsuarioLogueado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                UsuarioFront? usuario = await _httpClient.GetFromJsonAsync<UsuarioFront>($"Usuario/{dniUsuarioLogueado}");
+
+                if (usuario == null)
+                {
+                    TempData["Error"] = "Usuario inexistente o no encontrado.";
+                    return Redirect("Index");
+                }
+
+                return View(usuario);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener usuario por DNI");
+                return RedirectToAction("/Home/Index");
+            }
+        }
+
         // GET: /Usuario/CreateUsuario        para la vista de creación de usuario
         [Authorize(Roles = "Administrador")]
         [HttpGet]
@@ -100,6 +129,7 @@ namespace Front.Controllers
             ViewBag.Roles = new SelectList(rolesUsuario, "Descripcion", "Descripcion");
             return View();
         }
+        
         // POST: /Usuario
         [Authorize(Roles = "Administrador")]
         [HttpPost]

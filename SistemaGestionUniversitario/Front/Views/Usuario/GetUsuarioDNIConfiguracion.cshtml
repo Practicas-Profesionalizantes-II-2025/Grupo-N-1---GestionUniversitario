@@ -1,0 +1,62 @@
+﻿@model Front.Models.Respuestas.UsuarioFront
+
+@{
+    ViewData["Title"] = "ConfiguracionUsuario";
+}
+
+
+<div class="row">
+    <!-- DATOS -->
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h3 class="text-center py-2 bg-secondary text-white rounded">Datos Personales</h3>
+                <hr />
+
+                <div class="mb-3">
+                    <label asp-for="DNI" class="form-label">Usuario (DNI)</label>
+                    <input type="text" class="form-control" value="@Model.DNI" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" value="@Model.Nombre @Model.Apellido" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Localidad" class="form-label">Localidad</label>
+                    <input type="text" class="form-control" value="@Model.Localidad" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Direccion" class="form-label">Dirección</label>
+                    <input type="text" class="form-control" value="@Model.Direccion" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CaracteristicaTelefono" class="form-label">Contacto</label>
+                    <input type="text" class="form-control" value="@Model.CaracteristicaTelefono @Model.NumeroTelefono" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Cambio Contraseña</label>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="password" class="form-control" placeholder="Nueva Contraseña" />
+                        </div>
+                        <div class="col-md-6">
+                            <input type="password" class="form-control" placeholder="Confirmar Contraseña" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3 d-flex justify-content-end">
+                    <a asp-controller="Usuario" asp-action="UpdatePasswordUsuario" class="btn btn-secondary">
+                        Modificar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+<div/>

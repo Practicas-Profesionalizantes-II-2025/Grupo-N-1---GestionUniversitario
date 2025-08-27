@@ -56,7 +56,7 @@
     }
 
     <!-- Barra superior -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <img id="imgLogo" src="~/images/logoUTS.jpg" alt="UTS">
@@ -67,8 +67,9 @@
                 <!--  Menú dinámico según rol -->
                 @if (esAdmin)
                 {
+                    <li class="nav-item"><a class="nav-link" href="/Home/Index">Inicio</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="/Home/Index" role="button" data-bs-toggle="dropdown">
                             Inicio
                         </a>
                         <ul class="dropdown-menu">
@@ -90,11 +91,7 @@
                 }
                 @if (esAlumno)
                 {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Inicio
-                        </a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Index">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Inscripciones</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -109,11 +106,7 @@
                 }
                 @if (esProfesor)
                 {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Inicio
-                        </a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Index">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Asistencias</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Calendario Académico</a></li>
                     <li class="nav-item dropdown">
@@ -150,7 +143,7 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
-                        <a class="dropdown-item d-flex justify-content-between align-items-center" href="#">
+                        <a class="dropdown-item d-flex justify-content-between align-items-center" href="/Usuario/GetUsuarioDNIConfiguracion">
                             Configuración
                             <i class="bi bi-sliders"></i>
                         </a>
@@ -188,7 +181,7 @@
         }
 
     <div>
-        <div class="container mt-4">
+            <div class="container mt-4" style="padding-top: 70px;">
             @RenderBody()
 		</div>
     </div>
