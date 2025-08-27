@@ -4,42 +4,200 @@
     ViewData["Title"] = "Crear Materia";
 }
 
-<h2>Crear Materia</h2>
 
-<form asp-action="CreateMateria" method="post">
-    <div class="mb-3">
-        <label asp-for="Nombre" class="form-label"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/materia.css" />
+
+    <div class="container mt-5">
+        <h2>Crear Materia</h2>
+
+        <form asp-action="CreateMateria" method="post">
+
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" placeholder="Nombre"/>
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Anio" class="form-label">Año</label>
+                <input asp-for="Anio" type="number" class="form-control" placeholder="Año"/>
+                <span asp-validation-for="Anio" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Modalidad" class="form-label"></label>
+                <input asp-for="Modalidad" class="form-control" placeholder="Modalidad"/>
+                <span asp-validation-for="Modalidad" class="text-danger"></span>
+            </div>
+
+            <!-- Selector de Profesores -->
+            <div class="mb-3">
+                <label class="form-label">Profesores</label>
+                <div class="dropdown-container">
+                    <div class="dropdown-btn" onclick="toggleDropdown()">
+                        Seleccionar profesores...
+                    </div>
+                    <div class="dropdown-content" id="professorDropdown">
+                        @foreach (var profesor in Model.Profesores)
+                        {
+                            <div class="dropdown-item" onclick="selectProfessor(@profesor.ID, '@profesor.NombreCompleto')">
+                                @profesor.NombreCompleto
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="selected-items" id="selectedProfessors"></div>
+
+                <!-- Campo oculto para almacenar los IDs seleccionados -->
+                <input type="hidden" id="ProfesoresIDs" name="ProfesoresIDs" asp-for="ProfesoresIDs">
+            </div>
+
+            <!-- Selector de Días y Horarios -->
+            <div class="mb-3">
+                <label class="form-label">Días y Horarios</label>
+                <div class="dropdown-container">
+                    <div class="dropdown-btn" onclick="toggleHorariosDropdown()">
+                        Seleccionar días y horarios...
+                    </div>
+                    <div class="dropdown-content" id="horariosDropdown">
+                        @foreach (var horario in Model.DiasHorarios)
+                        {
+                            <div class="dropdown-item" onclick="selectHorario(@horario.ID, '@horario.DescripcionDia - @horario.DescripcionHorario')">
+                                @horario.DescripcionDia - @horario.DescripcionHorario
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="selected-items" id="selectedHorarios"></div>
+
+                <!-- Campo oculto para almacenar los IDs seleccionados -->
+                <input type="hidden" id="DiasHorariosIDs" name="DiasHorariosIDs" asp-for="DiasHorariosIDs">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Aceptar</button>
+            <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
+        </form>
     </div>
+    @section ScriptsDropdown {
+    <script>
+        // Función para mostrar/ocultar el desplegable de profesores
+        function toggleDropdown() {
+            const dropdown = document.getElementById('professorDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
 
-    <div class="mb-3">
-        <label asp-for="Anio" class="form-label"></label>
-        <input asp-for="Anio" type="number" class="form-control" />
-        <span asp-validation-for="Anio" class="text-danger"></span>
-    </div>
+        // Función para mostrar/ocultar el desplegable de horarios
+        function toggleHorariosDropdown() {
+            const dropdown = document.getElementById('horariosDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
 
-    <div class="mb-3">
-        <label asp-for="Modalidad" class="form-label"></label>
-        <input asp-for="Modalidad" class="form-control" />
-        <span asp-validation-for="Modalidad" class="text-danger"></span>
-    </div>
+        // Array para almacenar los profesores seleccionados
+        let selectedProfessors = [];
 
-    <div class="mb-3">
-        <label>Profesores</label>
-        <select asp-for="ProfesoresIDs" class="form-select" multiple
-                asp-items="@(new SelectList(Model.Profesores, "ID", "NombreCompleto"))">
-        </select>
-    </div>
+        // Función para seleccionar un profesor
+        function selectProfessor(id, nombre) {
+            // Si el profesor ya está seleccionado, no hacer nada
+            if (selectedProfessors.some(prof => prof.id === id)) {
+                return;
+            }
 
-    <div class="mb-3">
-        <label>Días y Horarios</label>
-        <select asp-for="DiasHorariosIDs" class="form-select" multiple
-                asp-items="@(new SelectList(Model.DiasHorarios.Select(d => new { d.ID, Descripcion = d.DescripcionDia + " - " + d.DescripcionHorario }), "ID", "Descripcion"))">
-        </select>
-    </div>
+            // Añadir a la lista de seleccionados
+            selectedProfessors.push({id: id, nombre: nombre});
 
-    <button type="submit" class="btn btn-primary">Aceptar</button>
-    <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
-</form>
+            // Actualizar la visualización
+            updateSelectedProfessors();
+
+            // Cerrar el desplegable
+            document.getElementById('professorDropdown').style.display = 'none';
+        }
+
+        // Función para eliminar un profesor seleccionado
+        function removeProfessor(id) {
+            selectedProfessors = selectedProfessors.filter(prof => prof.id !== id);
+            updateSelectedProfessors();
+        }
+
+        // Función para actualizar la visualización de profesores seleccionados
+        function updateSelectedProfessors() {
+            const container = document.getElementById('selectedProfessors');
+            const hiddenInput = document.getElementById('ProfesoresIDs');
+
+            // Limpiar el contenedor
+            container.innerHTML = '';
+
+            // Actualizar el campo oculto con los IDs
+            hiddenInput.value = selectedProfessors.map(prof => prof.id).join(',');
+
+            // Añadir cada profesor seleccionado
+            selectedProfessors.forEach(prof => {
+                const badge = document.createElement('div');
+                badge.className = 'selected-item';
+                badge.innerHTML = `${prof.nombre} <span class="remove-btn" onclick="removeProfessor(${prof.id})">×</span>`;
+                container.appendChild(badge);
+            });
+        }
+
+        // Array para almacenar los horarios seleccionados
+        let selectedHorarios = [];
+
+        // Función para seleccionar un horario
+        function selectHorario(id, descripcion) {
+            // Si el horario ya está seleccionado, no hacer nada
+            if (selectedHorarios.some(horario => horario.id === id)) {
+                return;
+            }
+
+            // Añadir a la lista de seleccionados
+            selectedHorarios.push({id: id, descripcion: descripcion});
+
+            // Actualizar la visualización
+            updateSelectedHorarios();
+
+            // Cerrar el desplegable
+            document.getElementById('horariosDropdown').style.display = 'none';
+        }
+
+        // Función para eliminar un horario seleccionado
+        function removeHorario(id) {
+            selectedHorarios = selectedHorarios.filter(horario => horario.id !== id);
+            updateSelectedHorarios();
+        }
+
+        // Función para actualizar la visualización de horarios seleccionados
+        function updateSelectedHorarios() {
+            const container = document.getElementById('selectedHorarios');
+            const hiddenInput = document.getElementById('DiasHorariosIDs');
+
+            // Limpiar el contenedor
+            container.innerHTML = '';
+
+            // Actualizar el campo oculto con los IDs
+            hiddenInput.value = selectedHorarios.map(horario => horario.id).join(',');
+
+            // Añadir cada horario seleccionado
+            selectedHorarios.forEach(horario => {
+                const badge = document.createElement('div');
+                badge.className = 'selected-item';
+                badge.innerHTML = `${horario.descripcion} <span class="remove-btn" onclick="removeHorario(${horario.id})">×</span>`;
+                container.appendChild(badge);
+            });
+        }
+
+        // Cerrar los desplegables al hacer clic fuera de ellos
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-btn')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
+}
+   
+
 
