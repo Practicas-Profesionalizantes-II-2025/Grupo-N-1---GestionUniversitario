@@ -61,7 +61,7 @@ infoModal.addEventListener('show.bs.modal', function (event) {
 });
 
 // ==========================
-//    FILTRO Y BUSCASDOR
+//    FILTRO Y BUSCADOR
 //==============================
 document.addEventListener("DOMContentLoaded", function () {
     const searchBox = document.getElementById("searchBox");
@@ -118,8 +118,3 @@ document.addEventListener("DOMContentLoaded", function () {
     filtroRol.addEventListener("change", aplicarFiltros);
     ordenNombre.addEventListener("change", aplicarFiltros);
 });
-
-
-
-
-

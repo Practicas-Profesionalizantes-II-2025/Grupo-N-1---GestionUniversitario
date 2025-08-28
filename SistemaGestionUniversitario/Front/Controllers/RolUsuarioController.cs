@@ -22,14 +22,15 @@ namespace Front.Controllers
         {
             try
             {
-                List<RolUsuarioFront>? rolesUsuario = await _httpClient.GetFromJsonAsync<List<RolUsuarioFront>>("RolUsuario");
+                var rolesUsuario = await _httpClient.GetFromJsonAsync<List<RolUsuarioFront>>("RolUsuario");
                 return Json(rolesUsuario ?? new List<RolUsuarioFront>());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener los roles de usuario desde la API");
-                return Content($"Error al obtener roles de usuario: {ex.Message}\n\n{ex.StackTrace}");
+                return Json(new { error = ex.Message });
             }
         }
+
     }
 }

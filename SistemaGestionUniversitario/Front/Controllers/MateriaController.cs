@@ -33,6 +33,21 @@ namespace Front.Controllers
             }
         }
 
+        // GET: /Materia/PlanDeEstudios
+        public async Task<IActionResult> PlanDeEstudios()
+        {
+            try
+            {
+                List<MateriaFront>? materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia");
+                return View("PlanDeEstudios", materias);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener materias desde la API");
+                return Content($"Error al obtener materias: {ex.Message}\n\n{ex.StackTrace}");
+            }
+        }
+
         // GET: /Materia/GetMateriaNombre/nombreMateria
         [HttpGet("{nombreMateria}")]
         public async Task<IActionResult> GetMateriaNombre(string nombreMateria)
