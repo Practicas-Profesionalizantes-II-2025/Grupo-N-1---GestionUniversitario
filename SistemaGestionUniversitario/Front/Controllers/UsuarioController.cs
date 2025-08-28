@@ -1,4 +1,5 @@
-﻿using Front.Models.Crear;
+﻿using Entidades.DTOs;
+using Front.Models.Crear;
 using Front.Models.Modificar;
 using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
@@ -260,11 +261,13 @@ namespace Front.Controllers
         // PUT: /Usuario/actualizarPassword/dni
         [Authorize(Roles = "Administrador, Profesor, Alumno")]
         [HttpPost]
-        public async Task<IActionResult> UpdatePasswordUsuario(string dni, ModificarUsuarioFront usuario)
+        public async Task<IActionResult> UpdatePasswordUsuario(ModificarUsuarioPasswordFront usuario)
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Usuario/actualizarPassword/{dni}", usuario);
+                string? dniUsuarioLogueado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Usuario/actualizarPassword/{dniUsuarioLogueado}", usuario);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -279,19 +282,25 @@ namespace Front.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Ocurrió un error inesperado al actualizar la contraseña.");
+                        ModelState.AddModelError("", "Los campos están vacíos o son incorrectos");
                     }
 
-                    return View(usuario);
+                    var usuarioFront = await _httpClient.GetFromJsonAsync<UsuarioFront>($"Usuario/{dniUsuarioLogueado}");
+                    return View("GetUsuarioDNIConfiguracion", usuarioFront);
                 }
 
                 TempData["Success"] = "Contraseña actualizada correctamente.";
-                return RedirectToAction("GetUsuarios");
+                return RedirectToAction("GetUsuarioDNIConfiguracion", new { dni = dniUsuarioLogueado });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al actualizar la contraseña");
-                return View(usuario);
+
+                string? dniUsuarioLogueado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var usuarioFront = await _httpClient.GetFromJsonAsync<UsuarioFront>($"Usuario/{dniUsuarioLogueado}");
+
+                ModelState.AddModelError("", "Los campos están vacíos o son incorrectos");
+                return View("GetUsuarioDNIConfiguracion", usuarioFront);
             }
         }
 

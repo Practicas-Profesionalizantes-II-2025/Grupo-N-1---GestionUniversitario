@@ -38,24 +38,32 @@
                     <input type="text" class="form-control" value="@Model.CaracteristicaTelefono @Model.NumeroTelefono" readonly />
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Cambio Contraseña</label>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="password" class="form-control" placeholder="Nueva Contraseña" />
-                        </div>
-                        <div class="col-md-6">
-                            <input type="password" class="form-control" placeholder="Confirmar Contraseña" />
+                <!-- CAMBIO PASSWORD -->
+                <form asp-action="UpdatePasswordUsuario" method="post"> 
+
+                    <div class="mb-3">
+                        <label class="form-label">Cambio Contraseña</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="password" name="ActualPassword" class="form-control" placeholder="Contraseña Actual" />
+                            </div>
+                            <div class="col-md-6">
+                                <input type="password" name="NuevaPassword" class="form-control" placeholder="Nueva Contraseña" />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-3 d-flex justify-content-end">
-                    <a asp-controller="Usuario" asp-action="UpdatePasswordUsuario" class="btn btn-secondary">
-                        Modificar
-                    </a>
-                </div>
+                    <div class="mb-3 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-secondary">Modificar</button>
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="text-danger mb-2">Los campos están vacíos o son incorrectos.</div>
+                    }
+
+                </form>
+                
             </div>
         </div>
     </div>
