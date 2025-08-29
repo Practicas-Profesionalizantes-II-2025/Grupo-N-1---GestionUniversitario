@@ -2,6 +2,7 @@
 using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Front.Controllers
 {
@@ -41,54 +42,77 @@ namespace Front.Controllers
             }
         }
 
-        // GET: /Inscripcion/GetInscripcionDNI/DNI
+        // GET: /Inscripcion/GetInscripcionesDNI/DNI
         [Authorize(Roles = "Alumno")]
         [HttpGet]
-        public async Task<IActionResult> GetInscripcionDNI(string dni)
+        public async Task<IActionResult> GetInscripcionesDNI()
         {
             try
             {
-                List<InscripcionFront>? inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorDNI/{dni}");
+                // DNI Usuario Logueado
+                string? dniUsuarioLogueado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (inscripciones == null)
+                // Todas las materias
+                List<MateriaFront> materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new List<MateriaFront>();
+
+                // Inscripciones del alumno
+                List<InscripcionFront> inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorDNI/{dniUsuarioLogueado}") ?? new List<InscripcionFront>();
+
+                // Lista combinada
+                List<InscripcionMateriaFront> inscripcionesMateria = materias.Select(m => new InscripcionMateriaFront
                 {
-                    TempData["Error"] = "Inscripcion inexistente o no encontrada.";
-                    return RedirectToAction("Index");
-                }
+                    IdMateria = m.ID,
+                    Nombre = m.Nombre,
+                    Anio = m.Anio,
+                    Modalidad = m.Modalidad,
+                    NombresProfesores = m.NombresProfesores,
+                    DescripcionDiasHorarios = m.DescripcionDiasHorarios,
+                    EstaInscripto = inscripciones.Any(i => i.IdMateria == m.ID)
+                }).ToList();
 
-                return View(inscripciones);
+                return View(inscripcionesMateria);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener inscripciones por DNI");
-                TempData["Error"] = "Ocurrió un error al buscar inscripciones. Intente nuevamente.";
-                return RedirectToAction("Index");
+                _logger.LogError(ex, "Error al obtener inscripciones");
+                TempData["Error"] = "Ocurrió un error al cargar las inscripciones.";
+                return RedirectToAction("Index", "Home");
             }
         }
+
 
         // POST: /Inscripcion
         [Authorize(Roles = "Alumno")]
         [HttpPost]
-        public async Task<IActionResult> CreateInscripcion(CrearInscripcionFront inscripcion)
+        public async Task<IActionResult> CreateInscripcion(string nombreMateria)
         {
             try
             {
+                // DNI Usuario Logueado
+                string? dniUsuarioLogueado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                CrearInscripcionFront inscripcion = new CrearInscripcionFront()
+                {
+                    DNIAlumno = dniUsuarioLogueado,
+                    NombreMateria = nombreMateria,
+                };
+
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync("Inscripcion", inscripcion);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     string error = await response.Content.ReadAsStringAsync();
                     ModelState.AddModelError("", error);
-                    return View("Index");
+                    return View("GetInscripcionesDNI");
                 }
 
                 TempData["Success"] = "Inscripcion dada de alta correctamente.";
-                return RedirectToAction("Index");
+                return RedirectToAction("GetInscripcionesDNI");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al dar de alta inscripcion.");
-                return View("Index");
+                return View("GetInscripcionesDNI");
             }
         }
 

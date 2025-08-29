@@ -58,7 +58,7 @@ namespace API.Controllers
         }
 
         // GET: api/Inscripcion/PorDNI/DNIAlumno
-        [HttpGet("PorDNI/{nombreMateria}")]
+        [HttpGet("PorDNI/{dni}")]
         public async Task<IActionResult> ObtenerInscripcionesDNI(string dni)
         {
             try
@@ -67,7 +67,7 @@ namespace API.Controllers
 
                 if (inscripcionDTO.Count == 0)
                 {
-                    return NoContent();
+                    return Ok(new List<InscripcionDTO>());
                 }
 
                 return Ok(inscripcionDTO);
