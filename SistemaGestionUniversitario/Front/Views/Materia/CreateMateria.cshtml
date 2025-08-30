@@ -9,77 +9,91 @@
     <link rel="stylesheet" href="~/css/materia.css" />
 
     <div class="container mt-5">
-        <h2>Crear Materia</h2>
+        <div class="card shadow-lg p-4 rounded-3">
+            <div class="card-body">
+                <h2>Crear Materia</h2>
 
-        <form asp-action="CreateMateria" method="post">
+                <form asp-action="CreateMateria" method="post">
 
-            <div class="mb-3">
-                <label asp-for="Nombre" class="form-label"></label>
-                <input asp-for="Nombre" class="form-control" placeholder="Nombre"/>
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Anio" class="form-label">Año</label>
-                <input asp-for="Anio" type="number" class="form-control" placeholder="Año"/>
-                <span asp-validation-for="Anio" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Modalidad" class="form-label"></label>
-                <input asp-for="Modalidad" class="form-control" placeholder="Modalidad"/>
-                <span asp-validation-for="Modalidad" class="text-danger"></span>
-            </div>
-
-            <!-- Selector de Profesores -->
-            <div class="mb-3">
-                <label class="form-label">Profesores</label>
-                <div class="dropdown-container">
-                    <div class="dropdown-btn" onclick="toggleDropdown()">
-                        Seleccionar profesores...
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Nombre"/>
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
                     </div>
-                    <div class="dropdown-content" id="professorDropdown">
-                        @foreach (var profesor in Model.Profesores)
-                        {
-                            <div class="dropdown-item" onclick="selectProfessor(@profesor.ID, '@profesor.NombreCompleto')">
-                                @profesor.NombreCompleto
-                            </div>
-                        }
-                    </div>
+
+                <div class="mb-3">
+                    <label asp-for="Anio" class="form-label">Año</label>
+                    <select asp-for="Anio" class="form-select">
+                        <option value="">Seleccionar año...</option>
+                        <option value="1">1°</option>
+                        <option value="2">2°</option>
+                        <option value="3">3°</option>
+                    </select>
+                    <span asp-validation-for="Anio" class="text-danger"></span>
                 </div>
 
-                <div class="selected-items" id="selectedProfessors"></div>
-
-                <!-- Campo oculto para almacenar los IDs seleccionados -->
-                <input type="hidden" id="ProfesoresIDs" name="ProfesoresIDs" asp-for="ProfesoresIDs">
-            </div>
-
-            <!-- Selector de Días y Horarios -->
-            <div class="mb-3">
-                <label class="form-label">Días y Horarios</label>
-                <div class="dropdown-container">
-                    <div class="dropdown-btn" onclick="toggleHorariosDropdown()">
-                        Seleccionar días y horarios...
-                    </div>
-                    <div class="dropdown-content" id="horariosDropdown">
-                        @foreach (var horario in Model.DiasHorarios)
-                        {
-                            <div class="dropdown-item" onclick="selectHorario(@horario.ID, '@horario.DescripcionDia - @horario.DescripcionHorario')">
-                                @horario.DescripcionDia - @horario.DescripcionHorario
-                            </div>
-                        }
-                    </div>
+                <div class="mb-3">
+                    <label asp-for="Modalidad" class="form-label">Modalidad</label>
+                    <select asp-for="Modalidad" class="form-select">
+                        <option value="">Seleccionar modalidad...</option>
+                        <option value="Práctica">Práctica</option>
+                        <option value="Teórica">Teórica</option>
+                        <option value="Teórica/Práctica">Teórica/Práctica</option>
+                    </select>
+                    <span asp-validation-for="Modalidad" class="text-danger"></span>
                 </div>
 
-                <div class="selected-items" id="selectedHorarios"></div>
+                    <!-- Selector de Profesores -->
+                    <div class="mb-3">
+                        <label class="form-label">Profesores</label>
+                        <div class="dropdown-container">
+                            <div class="dropdown-btn" onclick="toggleDropdown()">
+                                Seleccionar profesores...
+                            </div>
+                            <div class="dropdown-content" id="professorDropdown">
+                                @foreach (var profesor in Model.Profesores)
+                                {
+                                    <div class="dropdown-item" onclick="selectProfessor(@profesor.ID, '@profesor.NombreCompleto')">
+                                        @profesor.NombreCompleto
+                                    </div>
+                                }
+                            </div>
+                        </div>
 
-                <!-- Campo oculto para almacenar los IDs seleccionados -->
-                <input type="hidden" id="DiasHorariosIDs" name="DiasHorariosIDs" asp-for="DiasHorariosIDs">
+                        <div class="selected-items" id="selectedProfessors"></div>
+
+                        <!-- Campo oculto para almacenar los IDs seleccionados -->
+                        <input type="hidden" id="ProfesoresIDs" name="ProfesoresIDs" asp-for="ProfesoresIDs">
+                    </div>
+
+                    <!-- Selector de Días y Horarios -->
+                    <div class="mb-3">
+                        <label class="form-label">Días y Horarios</label>
+                        <div class="dropdown-container">
+                            <div class="dropdown-btn" onclick="toggleHorariosDropdown()">
+                                Seleccionar días y horarios...
+                            </div>
+                            <div class="dropdown-content" id="horariosDropdown">
+                                @foreach (var horario in Model.DiasHorarios)
+                                {
+                                    <div class="dropdown-item" onclick="selectHorario(@horario.ID, '@horario.DescripcionDia - @horario.DescripcionHorario')">
+                                        @horario.DescripcionDia - @horario.DescripcionHorario
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="selected-items" id="selectedHorarios"></div>
+
+                        <!-- Campo oculto para almacenar los IDs seleccionados -->
+                        <input type="hidden" id="DiasHorariosIDs" name="DiasHorariosIDs" asp-for="DiasHorariosIDs">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                    <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
+                </form>
             </div>
-
-            <button type="submit" class="btn btn-primary">Aceptar</button>
-            <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
-        </form>
+        </div>
     </div>
     @section ScriptsDropdown {
     <script>

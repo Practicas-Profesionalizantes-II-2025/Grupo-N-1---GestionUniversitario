@@ -105,6 +105,22 @@ namespace Front.Controllers
 
         // PUT: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public async Task<IActionResult> PutMateria()
+        {
+            var materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new List<MateriaFront>();
+
+            var vm = new ModificarMateriaFront
+            {
+                TodasMaterias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new(),
+                Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new(),
+                DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new()
+            };
+
+            return View(vm);
+        }
+
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{nombreMateria}")]
         public async Task<IActionResult> UpdateMateria(string nombreMateria, ModificarMateriaFront materia)
         {

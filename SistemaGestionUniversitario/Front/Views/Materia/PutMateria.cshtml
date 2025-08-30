@@ -1,0 +1,207 @@
+﻿@model Front.Models.Modificar.ModificarMateriaFront
+
+@{
+    ViewData["Title"] = "Modificar Materia";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="~/css/materia.css" />
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-3">
+        <div class="card-body">
+            <h2>Modificar Materia</h2>
+
+            <!-- Dropdown de materias -->
+            <div class="mb-3">
+                <label class="form-label">Materia</label>
+                <select id="MateriaSeleccionada" class="form-select" onchange="cargarMateria()">
+                    <option value="">Seleccionar materia...</option>
+                    @foreach (var materia in Model.TodasMaterias)
+                    {
+                        <option value="@materia.Nombre">@materia.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Año y Modalidad (readonly) -->
+            <div class="mb-3">
+                <label class="form-label">Año</label>
+                <input type="text" id="anioMateria" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Modalidad</label>
+                <input type="text" id="modalidadMateria" class="form-control" readonly />
+            </div>
+
+            <form id="formModificarMateria" method="post">
+                <!-- Profesores -->
+                <div class="mb-3">
+                    <label class="form-label">Profesores</label>
+                    <div class="dropdown-container">
+                        <div class="dropdown-btn" onclick="toggleDropdown()">Seleccionar profesores...</div>
+                        <div class="dropdown-content" id="professorDropdown"></div>
+                    </div>
+                    <div class="selected-items" id="selectedProfessors"></div>
+                    <input type="hidden" id="ProfesoresIDs" name="ProfesoresIDs" asp-for="ProfesoresIDs">
+                </div>
+
+                <!-- Días y Horarios -->
+                <div class="mb-3">
+                    <label class="form-label">Días y Horarios</label>
+                    <div class="dropdown-container">
+                        <div class="dropdown-btn" onclick="toggleHorariosDropdown()">Seleccionar días y horarios...</div>
+                        <div class="dropdown-content" id="horariosDropdown"></div>
+                    </div>
+                    <div class="selected-items" id="selectedHorarios"></div>
+                    <input type="hidden" id="DiasHorariosIDs" name="DiasHorariosIDs" asp-for="DiasHorariosIDs">
+                </div>
+
+                <button type="button" class="btn btn-primary" onclick="guardarMateria()">Guardar</button>
+                <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section ScriptsDropdown {
+<script>
+        let selectedProfessors = [];
+        let selectedHorarios = [];
+
+        const todasMaterias = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TodasMaterias));
+        const todosProfesores = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Profesores));
+        const todosHorarios = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DiasHorarios));
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('professorDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleHorariosDropdown() {
+            const dropdown = document.getElementById('horariosDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function selectProfessor(id, nombre) {
+            if (selectedProfessors.some(p => p.id === id)) return;
+            selectedProfessors.push({id, nombre});
+            updateSelectedProfessors();
+        }
+
+        function removeProfessor(id) {
+            selectedProfessors = selectedProfessors.filter(p => p.id !== id);
+            updateSelectedProfessors();
+        }
+
+        function updateSelectedProfessors() {
+            const container = document.getElementById('selectedProfessors');
+            const hiddenInput = document.getElementById('ProfesoresIDs');
+            container.innerHTML = '';
+            hiddenInput.value = selectedProfessors.map(p => p.id).join(',');
+            selectedProfessors.forEach(p => {
+                const badge = document.createElement('div');
+                badge.className = 'selected-item';
+                badge.innerHTML = `${p.nombre} <span class="remove-btn" onclick="removeProfessor(${p.id})">×</span>`;
+                container.appendChild(badge);
+            });
+        }
+
+        function selectHorario(id, descripcion) {
+            if (selectedHorarios.some(h => h.id === id)) return;
+            selectedHorarios.push({id, descripcion});
+            updateSelectedHorarios();
+        }
+
+        function removeHorario(id) {
+            selectedHorarios = selectedHorarios.filter(h => h.id !== id);
+            updateSelectedHorarios();
+        }
+
+        function updateSelectedHorarios() {
+            const container = document.getElementById('selectedHorarios');
+            const hiddenInput = document.getElementById('DiasHorariosIDs');
+            container.innerHTML = '';
+            hiddenInput.value = selectedHorarios.map(h => h.id).join(',');
+            selectedHorarios.forEach(h => {
+                const badge = document.createElement('div');
+                badge.className = 'selected-item';
+                badge.innerHTML = `${h.descripcion} <span class="remove-btn" onclick="removeHorario(${h.id})">×</span>`;
+                container.appendChild(badge);
+            });
+        }
+
+        // Cargar materia seleccionada
+        function cargarMateria() {
+            const nombre = document.getElementById('MateriaSeleccionada').value;
+            if (!nombre) return;
+
+            const materia = todasMaterias.find(m => m.Nombre === nombre);
+            if (!materia) return;
+
+            document.getElementById('anioMateria').value = materia.Anio;
+            document.getElementById('modalidadMateria').value = materia.Modalidad;
+
+            // Limpiar selecciones previas
+            selectedProfessors = [];
+            selectedHorarios = [];
+
+            // Profesores
+            const professorDropdown = document.getElementById('professorDropdown');
+            professorDropdown.innerHTML = '';
+            todosProfesores.forEach(prof => {
+                professorDropdown.innerHTML += `<div class="dropdown-item" onclick="selectProfessor(${prof.ID}, '${prof.NombreCompleto}')">${prof.NombreCompleto}</div>`;
+                // Preselección
+                if (materia.NombresProfesores.includes(prof.NombreCompleto)) {
+                    selectedProfessors.push({ id: prof.ID, nombre: prof.NombreCompleto });
+                }
+            });
+            updateSelectedProfessors();
+
+            // Horarios
+            const horariosDropdown = document.getElementById('horariosDropdown');
+            horariosDropdown.innerHTML = '';
+            todosHorarios.forEach(hor => {
+                const desc = `${hor.DescripcionDia} - ${hor.DescripcionHorario}`;
+                horariosDropdown.innerHTML += `<div class="dropdown-item" onclick="selectHorario(${hor.ID}, '${desc}')">${desc}</div>`;
+                if (materia.DescripcionDiasHorarios.includes(desc)) {
+                    selectedHorarios.push({ id: hor.ID, descripcion: desc });
+                }
+            });
+            updateSelectedHorarios();
+        }
+
+        // Guardar cambios
+        async function guardarMateria() {
+            const nombre = document.getElementById('MateriaSeleccionada').value;
+            if (!nombre) return alert('Selecciona una materia');
+
+            const data = {
+                ProfesoresIDs: selectedProfessors.map(p => p.id),
+                DiasHorariosIDs: selectedHorarios.map(h => h.id)
+            };
+
+            const response = await fetch(`/Materia/${nombre}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.href = '/Materia/GetMaterias';
+            } else {
+                alert('Error al actualizar la materia');
+            }
+        }
+
+        // Cerrar dropdowns al hacer clic afuera
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-btn')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) dropdowns[i].style.display = 'none';
+            }
+        }
+
+</script>
+}
