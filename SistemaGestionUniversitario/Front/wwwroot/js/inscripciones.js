@@ -1,6 +1,6 @@
-// ==========================
-//    FILTRO Y BUSCADOR
-//==============================
+// ==================================
+//    FILTRO Y BUSCADOR VISTA ALUMNO
+// ==================================
 document.addEventListener("DOMContentLoaded", function () {
     const searchBox = document.getElementById("searchBox");
     const filtroModalidad = document.getElementById("filtroModalidad");
@@ -52,4 +52,20 @@ document.addEventListener("DOMContentLoaded", function () {
     searchBox.addEventListener("input", aplicarFiltros);
     filtroModalidad.addEventListener("change", aplicarFiltros);
     ordenNombre.addEventListener("change", aplicarFiltros);
+});
+
+// ==============================
+//    LISTA DESPLEGABLE MATERIAS
+// ==============================
+document.getElementById("materiaSelect").addEventListener("change", function () {
+let materiaId = this.value;
+let filas = document.querySelectorAll("#tablaBody tr");
+
+    filas.forEach(fila => {
+        if (materiaId === "" || fila.getAttribute("data-materia") === materiaId) {
+    fila.style.display = "";
+        } else {
+    fila.style.display = "none";
+        }
+    });
 });

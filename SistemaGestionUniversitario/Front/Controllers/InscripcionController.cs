@@ -17,19 +17,30 @@ namespace Front.Controllers
             _logger = logger;
         }
 
-        // GET: /Inscripcion/GetInscripcionDNI/DNI
+        // GET: /Inscripcion/GetInscripcionMateria/nombreMateria
         [Authorize(Roles = "Administrador, Profesor")]
         [HttpGet]
         public async Task<IActionResult> GetInscripcionMateria(string nombreMateria)
         {
             try
             {
-                List<InscripcionFront>? inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorMateria/{nombreMateria}");
+                // Todas las materias para el listado
+                ViewBag.Materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new List<MateriaFront>();
 
+                // Guardo la materia seleccionada (puede ser null si recién entra a la vista)
+                ViewBag.SelectedMateria = nombreMateria;
+
+                // Traer solo inscripciones de la materia seleccionada
+                List<InscripcionFront>? inscripciones = null;
+                if (!string.IsNullOrEmpty(nombreMateria))
+                {
+                    inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorMateria/{nombreMateria}");
+                }
+
+                // Si no se seleccionó materia mostrar lista vacía
                 if (inscripciones == null)
                 {
-                    TempData["Error"] = "Inscripcion inexistente o no encontrada.";
-                    return RedirectToAction("Index");
+                    inscripciones = new List<InscripcionFront>();
                 }
 
                 return View(inscripciones);
@@ -41,6 +52,7 @@ namespace Front.Controllers
                 return RedirectToAction("Index");
             }
         }
+
 
         // GET: /Inscripcion/GetInscripcionesDNI/DNI
         [Authorize(Roles = "Alumno")]

@@ -1,1 +1,61 @@
-﻿
+﻿@model IEnumerable<Front.Models.Respuestas.InscripcionFront>
+
+@{
+    ViewData["Title"] = "GetInscripcionMateria";
+    List<Front.Models.Respuestas.MateriaFront>? materias = ViewBag.Materias as List<Front.Models.Respuestas.MateriaFront>;
+}
+
+<!-- lista materias-->
+<form asp-action="GetInscripcionMateria" method="get">
+    <select name="nombreMateria" class="form-select" onchange="this.form.submit()">
+        <option value="">-- Seleccione una materia --</option>
+        @foreach (var materia in ViewBag.Materias)
+        {
+            <option value="@materia.NombreMateria"
+                    selected="@(ViewBag.SelectedMateria == materia.NombreMateria ? "selected" : null)">
+                @materia.NombreMateria
+            </option>
+        }
+    </select>
+</form>
+
+<!-- tabla inscripciones-->
+<table class="tablas" id="tablaINscripciones">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DNIAlumno)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NombreAlumno)
+            </th>
+            <th>
+                Acciones
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var inscripcion in Model)
+        {
+            <tr>
+                <td>@inscripcion.DNIAlumno</td>
+                <td>@inscripcion.NombreAlumno @inscripcion.ApellidoAlumno</td>
+                <td class="acciones">
+
+                    <!-- Botón borrar -->
+                    <button type="button"
+                            class="btn btn-sm btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-dni="@inscripcion.DNIAlumno"
+                            data-nombre="@inscripcion.NombreAlumno"
+                            data-apellido="@inscripcion.ApellidoAlumno">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script src="~/js/inscripciones.js"></script>
