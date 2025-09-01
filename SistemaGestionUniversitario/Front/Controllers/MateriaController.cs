@@ -106,10 +106,8 @@ namespace Front.Controllers
         // PUT: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
         [HttpGet]
-        public async Task<IActionResult> PutMateria()
+        public async Task<IActionResult> ModificarMateria()
         {
-            var materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new List<MateriaFront>();
-
             var vm = new ModificarMateriaFront
             {
                 TodasMaterias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new(),
@@ -121,12 +119,16 @@ namespace Front.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpPut("{nombreMateria}")]
-        public async Task<IActionResult> UpdateMateria(string nombreMateria, ModificarMateriaFront materia)
+        [HttpPost]
+        public async Task<IActionResult> ModificarMateria(ModificarMateriaFront model)
         {
+            if (!ModelState.IsValid)
+                return View(model);
+
             try
             {
-                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{nombreMateria}", materia);
+                // Ahora el model ya tiene los IDs seleccionados
+                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{model.MateriaSeleccionada}", model);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -144,18 +146,19 @@ namespace Front.Controllers
                         ModelState.AddModelError("", "Ocurrió un error inesperado al actualizar la materia.");
                     }
 
-                    return View(materia);
+                    return View(model);
                 }
 
-                TempData["Success"] = "Materia actualizado correctamente.";
+                TempData["Success"] = "Materia actualizada correctamente.";
                 return RedirectToAction("GetMaterias");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al actualizar materia");
-                return View(materia);
+                return View(model);
             }
         }
+
 
         // DELETE: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
