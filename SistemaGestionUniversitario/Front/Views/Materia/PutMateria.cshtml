@@ -37,6 +37,9 @@
             </div>
 
             <form asp-action="ModificarMateria" method="post">
+                <!-- Campo oculto que viaja en el POST -->
+                <input type="hidden" id="MateriaSeleccionadaHidden" name="MateriaSeleccionada" />
+
                 <div class="mb-3">
                     <label class="form-label">Profesores</label>
                     <select id="profesoresSelect" name="ProfesoresIDs" class="form-select" multiple>
@@ -58,7 +61,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Guardar</button>
-            </form> 
+            </form>
         </div>
     </div>
 </div>
@@ -67,9 +70,15 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @section ScriptsDropdown {
     <script>
+        // Todas las materias de la API
         const todasMaterias = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TodasMaterias));
 
-        $(document).ready(function () {
+        // Listas completas del front para mapear nombres/descripciones a IDs
+        const listaProfesores = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Profesores));
+        const listaDiasHorarios = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DiasHorarios));
+
+        $(document).ready(function () 
+        {
             $('#profesoresSelect').select2({
                 placeholder: "Seleccionar profesores...",
                 width: '100%'
@@ -81,19 +90,52 @@
             });
         });
 
-        function cargarMateria() {
+        function cargarMateria() 
+        {
             const nombre = document.getElementById('MateriaSeleccionada').value;
             if (!nombre) return;
+
+            document.getElementById('MateriaSeleccionadaHidden').value = nombre;
 
             const materia = todasMaterias.find(m => m.Nombre === nombre);
             if (!materia) return;
 
+            // Verifica los datos recibidos
+            console.log("NombresProfesores:", materia.NombresProfesores);
+            console.log("ListaProfesores:", listaProfesores);
+
             document.getElementById('anioMateria').value = materia.Anio;
             document.getElementById('modalidadMateria').value = materia.Modalidad;
 
-            // Preseleccionar IDs en Select2
-            $('#profesoresSelect').val(materia.ProfesoresIDs).trigger('change');
-            $('#horariosSelect').val(materia.DiasHorariosIDs).trigger('change');
+            function nombresCoinciden(nombreA, nombreB) {
+                // Divide, ordena y compara
+                const partesA = nombreA.trim().toLowerCase().split(' ').sort();
+                const partesB = nombreB.trim().toLowerCase().split(' ').sort();
+                return partesB.join(', ') === partesA.join(' ');
+            }
+
+            // Profesores: comparación en minúsculas y trim
+            const profesoresIDs = materia.NombresProfesores
+                .map(nombreProf => {
+                    const prof = listaProfesores.find(p =>
+                        nombresCoinciden(p.NombreCompleto, nombreProf)
+                    );
+                    return prof ? prof.ID : null;
+                })
+                .filter(id => id != null);
+
+            // Días y horarios
+            const diasHorariosIDs = materia.DescripcionDiasHorarios
+                .map(desc => {
+                    const dh = listaDiasHorarios.find(d =>
+                        `${d.DescripcionDia} ${d.DescripcionHorario}`.trim().toLowerCase() === desc.trim().toLowerCase()
+                    );
+                    return dh ? dh.ID : null;
+                })
+                .filter(id => id != null);
+
+            $('#profesoresSelect').val(profesoresIDs).trigger('change');
+            $('#horariosSelect').val(diasHorariosIDs).trigger('change');
         }
     </script>
 }

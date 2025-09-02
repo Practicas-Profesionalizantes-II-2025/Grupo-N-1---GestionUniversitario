@@ -105,9 +105,11 @@ namespace Front.Controllers
 
         // PUT: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
-        [HttpGet]
-        public async Task<IActionResult> ModificarMateria()
+        [HttpGet("ModificarMateria")]
+        public async Task<IActionResult> PutMateria()
         {
+            var materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new List<MateriaFront>();
+
             var vm = new ModificarMateriaFront
             {
                 TodasMaterias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new(),
@@ -119,16 +121,12 @@ namespace Front.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpPost]
-        public async Task<IActionResult> ModificarMateria(ModificarMateriaFront model)
+        [HttpPut("{nombreMateria}")]
+        public async Task<IActionResult> UpdateMateria(string nombreMateria, ModificarMateriaFront materia)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
             try
             {
-                // Ahora el model ya tiene los IDs seleccionados
-                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{model.MateriaSeleccionada}", model);
+                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{nombreMateria}", materia);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -146,7 +144,7 @@ namespace Front.Controllers
                         ModelState.AddModelError("", "Ocurrió un error inesperado al actualizar la materia.");
                     }
 
-                    return View(model);
+                    return View(materia);
                 }
 
                 TempData["Success"] = "Materia actualizada correctamente.";
@@ -155,9 +153,10 @@ namespace Front.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al actualizar materia");
-                return View(model);
+                return View(materia);
             }
         }
+
 
 
         // DELETE: /Materia/nombreMateria
