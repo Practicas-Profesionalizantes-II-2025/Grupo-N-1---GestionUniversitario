@@ -46,7 +46,7 @@ namespace API.Controllers
 
                 if (inscripcionDTO.Count == 0)
                 {
-                    return NoContent();
+                    return Ok(new List<InscripcionDTO>());
                 }
 
                 return Ok(inscripcionDTO);
@@ -98,7 +98,7 @@ namespace API.Controllers
         {
             try
             {
-                await _inscripcionLogic.BajaInscripcion(nombreMateria, dniAlumno);
+                await _inscripcionLogic.BajaInscripcion(dniAlumno, nombreMateria);
 
                 return Ok();
             }

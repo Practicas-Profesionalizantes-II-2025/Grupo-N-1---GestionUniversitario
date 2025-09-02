@@ -30,17 +30,11 @@ namespace Front.Controllers
                 // Guardo la materia seleccionada (puede ser null si recién entra a la vista)
                 ViewBag.SelectedMateria = nombreMateria;
 
-                // Traer solo inscripciones de la materia seleccionada
-                List<InscripcionFront>? inscripciones = null;
+                // Traer inscripciones de la materia seleccionada
+                List<InscripcionFront>? inscripciones = new List<InscripcionFront>();
                 if (!string.IsNullOrEmpty(nombreMateria))
                 {
                     inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorMateria/{nombreMateria}");
-                }
-
-                // Si no se seleccionó materia mostrar lista vacía
-                if (inscripciones == null)
-                {
-                    inscripciones = new List<InscripcionFront>();
                 }
 
                 return View(inscripciones);
@@ -49,7 +43,7 @@ namespace Front.Controllers
             {
                 _logger.LogError(ex, "Error al obtener inscripciones por nombre de materia");
                 TempData["Error"] = "Ocurrió un error al buscar inscripciones. Intente nuevamente.";
-                return RedirectToAction("Index");
+                return RedirectToAction("GetInscripcionMateria");
             }
         }
 
@@ -153,17 +147,17 @@ namespace Front.Controllers
                         TempData["Error"] = "Ocurrió un error inesperado al dar de baja la inscripcion.";
                     }
 
-                    return RedirectToAction("GetInscripcionMateria");
+                    return RedirectToAction("GetInscripcionMateria", new { nombreMateria });
                 }
 
                 TempData["Success"] = "Inscripcion dada de baja correctamente.";
-                return RedirectToAction("GetInscripcionMateria");
+                return RedirectToAction("GetInscripcionMateria", new { nombreMateria });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al dar de baja la inscripcion");
                 TempData["Error"] = "Ocurrió un error al dar de baja la inscripcion.";
-                return RedirectToAction("GetInscripcionMateria");
+                return RedirectToAction("GetInscripcionMateria", new { nombreMateria });
             }
         }
     }
