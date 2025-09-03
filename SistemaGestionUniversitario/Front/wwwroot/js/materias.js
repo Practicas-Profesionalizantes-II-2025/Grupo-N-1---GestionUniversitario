@@ -48,5 +48,60 @@ async function infoMateria(nombreMateria) {
     }
 }
 
+// Boton Filtros
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const filtroModalidad = document.getElementById("filtroModalidad");
+    const ordenNombre = document.getElementById("ordenNombre");
+    const tbody = document.querySelector("#materiaTable");
+
+    // Guardar copia original de filas
+    let filasOriginales = Array.from(tbody.querySelectorAll("tr"));
+
+    function aplicarFiltros() {
+        let texto = (searchInput?.value || "").toLowerCase().trim();
+        let modalidad = (filtroModalidad?.value || "").toLowerCase().trim();
+        let orden = (ordenNombre?.value || "").toLowerCase();
+
+        console.log("Aplicando filtros:", { texto, modalidad, orden });
+
+        let filasFiltradas = filasOriginales.filter(fila => {
+            let columnas = fila.querySelectorAll("td");
+
+            let nombre = (columnas[0]?.textContent || "").toLowerCase().trim();
+            let anio = (columnas[1]?.textContent || "").toLowerCase().trim();
+            let modalidadFila = (columnas[2]?.textContent || "").toLowerCase().trim();
+
+            let cumpleBusqueda =
+                nombre.includes(texto) || anio.includes(texto) || modalidadFila.includes(texto);
+
+            let cumpleModalidad = modalidad === "" || modalidadFila === modalidad;
+
+            return cumpleBusqueda && cumpleModalidad;
+        });
+
+        // Ordenar por nombre (columna 0)
+        if (orden === "asc") {
+            filasFiltradas.sort((a, b) =>
+                a.cells[0].textContent.localeCompare(b.cells[0].textContent)
+            );
+        } else if (orden === "desc") {
+            filasFiltradas.sort((a, b) =>
+                b.cells[0].textContent.localeCompare(a.cells[0].textContent)
+            );
+        }
+
+        // Repintar tabla
+        tbody.innerHTML = "";
+        filasFiltradas.forEach(f => tbody.appendChild(f));
+    }
+
+    // Eventos
+    if (searchInput) searchInput.addEventListener("input", aplicarFiltros);
+    if (filtroModalidad) filtroModalidad.addEventListener("change", aplicarFiltros);
+    if (ordenNombre) ordenNombre.addEventListener("change", aplicarFiltros);
+});
+
+
 
 
