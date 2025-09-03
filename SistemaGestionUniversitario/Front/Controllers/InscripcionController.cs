@@ -17,19 +17,24 @@ namespace Front.Controllers
             _logger = logger;
         }
 
-        // GET: /Inscripcion/GetInscripcionDNI/DNI
+        // GET: /Inscripcion/GetInscripcionMateria/nombreMateria
         [Authorize(Roles = "Administrador, Profesor")]
         [HttpGet]
         public async Task<IActionResult> GetInscripcionMateria(string nombreMateria)
         {
             try
             {
-                List<InscripcionFront>? inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorMateria/{nombreMateria}");
+                // Todas las materias para el listado
+                ViewBag.Materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new List<MateriaFront>();
 
-                if (inscripciones == null)
+                // Guardo la materia seleccionada (puede ser null si recién entra a la vista)
+                ViewBag.SelectedMateria = nombreMateria;
+
+                // Traer inscripciones de la materia seleccionada
+                List<InscripcionFront>? inscripciones = new List<InscripcionFront>();
+                if (!string.IsNullOrEmpty(nombreMateria))
                 {
-                    TempData["Error"] = "Inscripcion inexistente o no encontrada.";
-                    return RedirectToAction("Index");
+                    inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorMateria/{nombreMateria}");
                 }
 
                 return View(inscripciones);
@@ -38,9 +43,10 @@ namespace Front.Controllers
             {
                 _logger.LogError(ex, "Error al obtener inscripciones por nombre de materia");
                 TempData["Error"] = "Ocurrió un error al buscar inscripciones. Intente nuevamente.";
-                return RedirectToAction("Index");
+                return RedirectToAction("GetInscripcionMateria");
             }
         }
+
 
         // GET: /Inscripcion/GetInscripcionesDNI/DNI
         [Authorize(Roles = "Alumno")]
@@ -141,17 +147,17 @@ namespace Front.Controllers
                         TempData["Error"] = "Ocurrió un error inesperado al dar de baja la inscripcion.";
                     }
 
-                    return RedirectToAction("GetInscripcionMateria");
+                    return RedirectToAction("GetInscripcionMateria", new { nombreMateria });
                 }
 
                 TempData["Success"] = "Inscripcion dada de baja correctamente.";
-                return RedirectToAction("GetInscripcionMateria");
+                return RedirectToAction("GetInscripcionMateria", new { nombreMateria });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al dar de baja la inscripcion");
                 TempData["Error"] = "Ocurrió un error al dar de baja la inscripcion.";
-                return RedirectToAction("GetInscripcionMateria");
+                return RedirectToAction("GetInscripcionMateria", new { nombreMateria });
             }
         }
     }

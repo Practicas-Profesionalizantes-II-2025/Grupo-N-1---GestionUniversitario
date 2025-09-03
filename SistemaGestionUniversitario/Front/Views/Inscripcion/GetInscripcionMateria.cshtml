@@ -1,1 +1,129 @@
-﻿
+﻿@model IEnumerable<Front.Models.Respuestas.InscripcionFront>
+
+@{
+    ViewData["Title"] = "GetInscripcionMateria";
+    List<Front.Models.Respuestas.MateriaFront>? materias = ViewBag.Materias as List<Front.Models.Respuestas.MateriaFront>;
+}
+
+<!-- lista materias-->
+<form asp-action="GetInscripcionMateria" method="get" class="mb-3">
+    <select name="nombreMateria" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+        <option value="">Seleccione una Materia</option>
+        @foreach (var materia in ViewBag.Materias)
+        {
+            <option value="@materia.Nombre"
+                    selected="@(ViewBag.SelectedMateria == materia.Nombre ? "selected" : null)">
+                @materia.Nombre
+            </option>
+        }
+    </select>
+</form>
+
+<!-- tabla inscripciones-->
+<table class="tablas" id="tablaINscripciones">
+    <thead>
+        <tr>
+            <th>
+                DNI
+            </th>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Acciones
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var inscripcion in Model)
+            {
+                <tr>
+                    <td>@inscripcion.DNIAlumno</td>
+                    <td>@inscripcion.NombreAlumno @inscripcion.ApellidoAlumno</td>
+                    <td class="acciones">
+                        <!-- Botón borrar -->
+                        <button type="button"
+                                class="btn btn-sm btn-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteModal"
+                                data-dni="@inscripcion.DNIAlumno"
+                                data-nombre="@inscripcion.NombreAlumno"
+                                data-apellido="@inscripcion.ApellidoAlumno"
+                                data-nombreMateria="@inscripcion.NombreMateria">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center">No hay inscripciones para esta materia.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- ELIMINAR -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteLabel">Dar de Baja</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">¿Desea dar de baja la inscripción del usuario seleccionado?</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="confirmCheckbox">
+                    <label class="form-check-label" for="confirmCheckbox">
+                        Confirmar
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" id="btnAceptar" disabled>Aceptar</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const confirmModal = document.getElementById('confirmDeleteModal');
+            const confirmCheckbox = document.getElementById('confirmCheckbox');
+            const btnAceptar = document.getElementById('btnAceptar');
+            const deleteForm = document.getElementById('deleteForm');
+            const deleteMessage = document.getElementById('deleteMessage');
+
+            if (!confirmModal || !confirmCheckbox || !btnAceptar || !deleteForm || !deleteMessage) return;
+
+            confirmModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const dni = button.getAttribute('data-dni');
+                const nombre = button.getAttribute('data-nombre');
+                const apellido = button.getAttribute('data-apellido');
+                const nombreMateria = button.getAttribute('data-nombreMateria');
+
+                deleteMessage.textContent = `¿Desea dar de baja la inscripción del usuario ${nombre} ${apellido} (DNI: ${dni})?`;
+
+                deleteForm.setAttribute('action', `/Inscripcion/DeleteInscripcion?nombreMateria=${nombreMateria}&dni=${dni}`);
+
+                confirmCheckbox.checked = false;
+                btnAceptar.disabled = true;
+            });
+
+            confirmCheckbox.addEventListener('change', function () {
+                btnAceptar.disabled = !this.checked;
+            });
+        });
+    </script>
+}
