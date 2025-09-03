@@ -121,12 +121,12 @@ namespace Front.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpPut("{nombreMateria}")]
-        public async Task<IActionResult> UpdateMateria(string nombreMateria, ModificarMateriaFront materia)
+        [HttpPost]
+        public async Task<IActionResult> UpdateMateria(ModificarMateriaFront materia)
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{nombreMateria}", materia);
+                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{materia.MateriaSeleccionada}", materia);
 
                 if (!response.IsSuccessStatusCode)
                 {

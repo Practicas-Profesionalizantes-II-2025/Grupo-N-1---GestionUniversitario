@@ -36,7 +36,7 @@
                 <input type="text" id="modalidadMateria" class="form-control" readonly />
             </div>
 
-            <form asp-action="ModificarMateria" method="post">
+            <form asp-action="UpdateMateria" method="post">
                 <!-- Campo oculto que viaja en el POST -->
                 <input type="hidden" id="MateriaSeleccionadaHidden" name="MateriaSeleccionada" />
 
@@ -61,6 +61,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
             </form>
         </div>
     </div>
