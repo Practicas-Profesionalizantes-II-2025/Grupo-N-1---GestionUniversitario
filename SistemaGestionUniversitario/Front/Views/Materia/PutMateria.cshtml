@@ -1,0 +1,143 @@
+﻿@model Front.Models.Modificar.ModificarMateriaFront
+
+@{
+    ViewData["Title"] = "Modificar Materia";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="~/css/materia.css" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-3">
+        <div class="card-body">
+            <h2>Modificar Materia</h2>
+
+            <!-- Dropdown de materias -->
+            <div class="mb-3">
+                <label class="form-label">Materia</label>
+                <select id="MateriaSeleccionada" name="MateriaSeleccionada" class="form-select" onchange="cargarMateria()">
+                    <option value="">Seleccionar materia...</option>
+                    @foreach (var materia in Model.TodasMaterias)
+                    {
+                        <option value="@materia.Nombre">@materia.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Año y Modalidad (readonly) -->
+            <div class="mb-3">
+                <label class="form-label">Año</label>
+                <input type="text" id="anioMateria" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Modalidad</label>
+                <input type="text" id="modalidadMateria" class="form-control" readonly />
+            </div>
+
+            <form asp-action="UpdateMateria" method="post">
+                <!-- Campo oculto que viaja en el POST -->
+                <input type="hidden" id="MateriaSeleccionadaHidden" name="MateriaSeleccionada" />
+
+                <div class="mb-3">
+                    <label class="form-label">Profesores</label>
+                    <select id="profesoresSelect" name="ProfesoresIDs" class="form-select" multiple>
+                        @foreach (var prof in Model.Profesores)
+                        {
+                            <option value="@prof.ID">@prof.NombreCompleto</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Días y Horarios</label>
+                    <select id="horariosSelect" name="DiasHorariosIDs" class="form-select" multiple>
+                        @foreach (var hor in Model.DiasHorarios)
+                        {
+                            <option value="@hor.ID">@hor.DescripcionDia - @hor.DescripcionHorario</option>
+                        }
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+@section ScriptsDropdown {
+    <script>
+        // Todas las materias de la API
+        const todasMaterias = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TodasMaterias));
+
+        // Listas completas del front para mapear nombres/descripciones a IDs
+        const listaProfesores = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Profesores));
+        const listaDiasHorarios = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DiasHorarios));
+
+        $(document).ready(function () 
+        {
+            $('#profesoresSelect').select2({
+                placeholder: "Seleccionar profesores...",
+                width: '100%'
+            });
+
+            $('#horariosSelect').select2({
+                placeholder: "Seleccionar días y horarios...",
+                width: '100%'
+            });
+        });
+
+        function cargarMateria() 
+        {
+            const nombre = document.getElementById('MateriaSeleccionada').value;
+            if (!nombre) return;
+
+            document.getElementById('MateriaSeleccionadaHidden').value = nombre;
+
+            const materia = todasMaterias.find(m => m.Nombre === nombre);
+            if (!materia) return;
+
+            // Verifica los datos recibidos
+            console.log("NombresProfesores:", materia.NombresProfesores);
+            console.log("ListaProfesores:", listaProfesores);
+
+            document.getElementById('anioMateria').value = materia.Anio;
+            document.getElementById('modalidadMateria').value = materia.Modalidad;
+
+            function nombresCoinciden(nombreA, nombreB) {
+                // Divide, ordena y compara
+                const partesA = nombreA.trim().toLowerCase().split(' ').sort();
+                const partesB = nombreB.trim().toLowerCase().split(' ').sort();
+                return partesB.join(', ') === partesA.join(' ');
+            }
+
+            // Profesores: comparación en minúsculas y trim
+            const profesoresIDs = materia.NombresProfesores
+                .map(nombreProf => {
+                    const prof = listaProfesores.find(p =>
+                        nombresCoinciden(p.NombreCompleto, nombreProf)
+                    );
+                    return prof ? prof.ID : null;
+                })
+                .filter(id => id != null);
+
+            // Días y horarios
+            const diasHorariosIDs = materia.DescripcionDiasHorarios
+                .map(desc => {
+                    const dh = listaDiasHorarios.find(d =>
+                        `${d.DescripcionDia} ${d.DescripcionHorario}`.trim().toLowerCase() === desc.trim().toLowerCase()
+                    );
+                    return dh ? dh.ID : null;
+                })
+                .filter(id => id != null);
+
+            $('#profesoresSelect').val(profesoresIDs).trigger('change');
+            $('#horariosSelect').val(diasHorariosIDs).trigger('change');
+        }
+    </script>
+}
+

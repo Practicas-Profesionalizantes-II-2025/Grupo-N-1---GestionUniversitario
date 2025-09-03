@@ -49,61 +49,99 @@ namespace Front.Controllers
         }
 
         // GET: /Materia/GetMateriaNombre/nombreMateria
-        [HttpGet("{nombreMateria}")]
-        public async Task<IActionResult> GetMateriaNombre(string nombreMateria)
+        [HttpGet("Materia/GetMateriaJson/{nombreMateria}")]
+        public async Task<IActionResult> GetMateriaJson(string nombreMateria)
         {
             try
             {
                 MateriaFront? materia = await _httpClient.GetFromJsonAsync<MateriaFront>($"Materia/{nombreMateria}");
-
                 if (materia == null)
-                {
-                    TempData["Error"] = "Materia inexistente o no encontrada.";
-                    return RedirectToAction("GetMaterias");
-                }
-                return View(materia);
+                    return NotFound(new { message = "Materia inexistente o no encontrada." });
+
+                return Ok(materia);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener materia por nombre");
-                return RedirectToAction("GetMaterias");
+                return StatusCode(500, new { message = "Error interno al obtener materia." });
             }
         }
 
-        // POST: /Materia/PostMateria
         [Authorize(Roles = "Administrador")]
-        [HttpPost]
-        public async Task<IActionResult> CreateMateria(CrearMateriaFront materia)
+        [HttpGet]
+        public async Task<IActionResult> CreateMateria()
         {
-            try
+            var vm = new CrearMateriaFront
             {
-                HttpResponseMessage response = await _httpClient.PostAsJsonAsync("Materia", materia);
+                Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new(),
+                DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new()
+            };
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    string error = await response.Content.ReadAsStringAsync();
-                    ModelState.AddModelError("", error);
-                    return View(materia);
-                }
-
-                TempData["Success"] = "Materia creado correctamente.";
-                return RedirectToAction("GetMaterias");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear materia");
-                return View(materia);
-            }
+            return View(vm);
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> CreateMateria(CrearMateriaFront model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Volvemos a cargar las listas en caso de error
+                model.Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new();
+                model.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
+                return View(model);
+            }
+
+            var materia = new
+            {
+                Nombre = model.Nombre,
+                Anio = model.Anio,
+                Modalidad = model.Modalidad,
+                ProfesoresIDs = model.ProfesoresIDs,
+                DiasHorariosIDs = model.DiasHorariosIDs
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("Materia", materia);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string error = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError("", error);
+
+                model.Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new();
+                model.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
+                return View(model);
+            }
+
+            TempData["Success"] = "Materia creada correctamente.";
+            return RedirectToAction("GetMaterias");
+        }
+
 
         // PUT: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
-        [HttpPut("{nombreMateria}")]
-        public async Task<IActionResult> UpdateMateria(string nombreMateria, ModificarMateriaFront materia)
+        [HttpGet("ModificarMateria")]
+        public async Task<IActionResult> PutMateria()
+        {
+            var materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new List<MateriaFront>();
+
+            var vm = new ModificarMateriaFront
+            {
+                TodasMaterias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new(),
+                Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new(),
+                DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new()
+            };
+
+            return View(vm);
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateMateria(ModificarMateriaFront materia)
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{nombreMateria}", materia);
+                HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{materia.MateriaSeleccionada}", materia);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -124,7 +162,7 @@ namespace Front.Controllers
                     return View(materia);
                 }
 
-                TempData["Success"] = "Materia actualizado correctamente.";
+                TempData["Success"] = "Materia actualizada correctamente.";
                 return RedirectToAction("GetMaterias");
             }
             catch (Exception ex)
@@ -134,41 +172,45 @@ namespace Front.Controllers
             }
         }
 
+
+
         // DELETE: /Materia/nombreMateria
         [Authorize(Roles = "Administrador")]
-        [HttpDelete("{nombreMateria}")]
+        [HttpDelete("Materia/{nombreMateria}")]
         public async Task<IActionResult> DeleteMateria(string nombreMateria)
         {
             try
             {
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"Materia/{nombreMateria}");
+
                 if (!response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
-                        TempData["Error"] = "No se encontró una materia con ese nombre.";
+                        return NotFound("No se encontró una materia con ese nombre.");
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                     {
                         string error = await response.Content.ReadAsStringAsync();
-                        TempData["Error"] = $"Error de validación: {error}";
+                        return BadRequest($"Error de validación: {error}");
                     }
                     else
                     {
-                        TempData["Error"] = "Ocurrió un error inesperado al eliminar la materia.";
+                        return StatusCode((int)response.StatusCode, "Ocurrió un error inesperado al eliminar la materia.");
                     }
-
-                    return RedirectToAction("GetMaterias");
                 }
-                TempData["Success"] = "Materia eliminada correctamente.";
-                return RedirectToAction("GetMaterias");
+
+                return Ok(new { message = "Materia eliminada correctamente." });
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al eliminar materia");
-                TempData["Error"] = "Ocurrió un error al eliminar la materia.";
-                return RedirectToAction("GetMaterias");
+                return StatusCode(500, "Ocurrió un error al eliminar la materia.");
             }
         }
+        
+
+
     }
 }

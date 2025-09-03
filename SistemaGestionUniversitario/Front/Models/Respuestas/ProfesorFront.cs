@@ -7,5 +7,6 @@
         public string Nombre { get; set; }
         public string Apellido { get; set; }
         public DateTime FechaInicioContrato { get; set; }
+        public string NombreCompleto => $"{Apellido}, {Nombre}";
     }
 }
