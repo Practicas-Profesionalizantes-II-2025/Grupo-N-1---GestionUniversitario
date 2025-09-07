@@ -38,27 +38,59 @@ confirmCheckbox.addEventListener('change', function () {
 // MODAL INFORMACION USUARIO
 
 // =======================
-
 const infoModal = document.getElementById('informacionUsuario');
 
+// Cuando se abre el modal
 infoModal.addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
+    const button = event.relatedTarget; // botón que abrió el modal
+    const telefonoCompleto = button.getAttribute('data-telefono') || '';
+    let caracteristica = '';
+    let numero = '';
 
-    const dni = button.getAttribute('data-dni');
-    const nombre = button.getAttribute('data-nombre');
-    const apellido = button.getAttribute('data-apellido');
-    const localidad = button.getAttribute('data-localidad');
-    const direccion = button.getAttribute('data-direccion');
-    const telefono = button.getAttribute('data-telefono');
-    const rol = button.getAttribute('data-rol');
+    // Separar característica y número
+    const partes = telefonoCompleto.trim().split(' ');
+    if (partes.length >= 2) {
+        caracteristica = partes[0];
+        numero = partes.slice(1).join(' ');
+    } else {
+        numero = telefonoCompleto;
+    }
 
-    document.getElementById('infoUsuarioLabel').textContent = `${nombre} ${apellido}`;
-    document.getElementById('infoDni').textContent = dni;
-    document.getElementById('infoLocalidad').textContent = localidad;
-    document.getElementById('infoDireccion').textContent = direccion;
-    document.getElementById('infoTelefono').textContent = telefono;
-    document.getElementById('infoRol').textContent = rol;
+    // Cargar datos en los inputs
+    document.getElementById('infoCaracteristicaTelefono').value = caracteristica;
+    document.getElementById('infoNumeroTelefono').value = numero;
+    document.getElementById('infoDni').value = button.getAttribute('data-dni');
+    document.getElementById('infoNombre').value = button.getAttribute('data-nombre');
+    document.getElementById('infoApellido').value = button.getAttribute('data-apellido');
+    document.getElementById('infoLocalidad').value = button.getAttribute('data-localidad');
+    document.getElementById('infoDireccion').value = button.getAttribute('data-direccion');
+    document.getElementById('infoRol').value = button.getAttribute('data-rol');
+    document.getElementById('infoFechaContratoIngreso').value = button.getAttribute('data-fechaContratoIngreso');
+
+    // Deshabilitar todos los inputs al abrir
+    document.querySelectorAll('#infoUsuarioForm input').forEach(i => i.disabled = true);
+    document.getElementById('btnConfirmar').disabled = true;
+
+    // Asegurar que rol y fecha siempre estén deshabilitados
+    document.getElementById('infoRol').disabled = true;
+    document.getElementById('infoFechaContratoIngreso').disabled = true;
+
+    document.getElementById('infoUsuarioForm').setAttribute('method', 'post');
+
 });
+
+// Botón Modificar → habilita todo excepto DNI, Rol y Fecha
+const btnModificar = document.getElementById('btnModificar');
+if (btnModificar) {
+    btnModificar.addEventListener('click', function () {
+        document.querySelectorAll('#infoUsuarioForm input').forEach(i => {
+            if (i.id !== 'infoDni' && i.id !== 'infoRol' && i.id !== 'infoFechaContratoIngreso') {
+                i.disabled = false;
+            }
+        });
+        document.getElementById('btnConfirmar').disabled = false;
+    });
+}
 
 // ==========================
 //    FILTRO Y BUSCADOR
@@ -118,3 +150,5 @@ document.addEventListener("DOMContentLoaded", function () {
     filtroRol.addEventListener("change", aplicarFiltros);
     ordenNombre.addEventListener("change", aplicarFiltros);
 });
+
+

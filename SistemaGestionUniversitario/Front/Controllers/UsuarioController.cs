@@ -202,19 +202,19 @@ namespace Front.Controllers
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
-                        ModelState.AddModelError("", "No se encontró el usuario con ese DNI.");
+                        TempData["Error"] = "No se encontró el usuario con ese DNI.";
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                     {
                         string error = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", $"Error de validación: {error}");
+                        TempData["Error"] = $"Error de validación: {error}";
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Ocurrió un error inesperado al actualizar el usuario.");
+                        TempData["Error"] = "Ocurrió un error inesperado al actualizar el usuario.";
                     }
 
-                    return View(usuario);
+                    return RedirectToAction("GetUsuarios"); // 👈 volvés al listado
                 }
 
                 TempData["Success"] = "Usuario actualizado correctamente.";
@@ -223,9 +223,11 @@ namespace Front.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al actualizar usuario");
-                return View(usuario);
+                TempData["Error"] = "Error inesperado al actualizar el usuario.";
+                return RedirectToAction("GetUsuarios");
             }
         }
+
 
         // PUT: /Usuario/actualizarPassword/dni
         [Authorize(Roles = "Administrador, Profesor, Alumno")]

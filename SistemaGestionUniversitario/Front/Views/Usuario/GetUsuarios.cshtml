@@ -38,7 +38,6 @@
       </div>
         <div>
             <a asp-controller="Usuario" asp-action="CreateUsuario" class="btn btn-secondary">Crear usuario</a>
-            <a asp-controller="Usuario" asp-action="UpdateUsuario" class="btn btn-secondary">Modificar usuario</a>
         </div>
     </div>
 
@@ -80,7 +79,8 @@
                                 data-localidad="@usuario.Localidad"
                                 data-direccion="@usuario.Direccion"
                                 data-telefono="@usuario.CaracteristicaTelefono @usuario.NumeroTelefono"
-                                data-rol="@usuario.RolUsuarioDescripcion">
+                                data-rol="@usuario.RolUsuarioDescripcion"
+                                data-fechaContratoIngreso="@usuario.FechaContratoIngreso.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)">
                             <i class="bi bi-info-circle"></i>
                         </button>
 
@@ -129,23 +129,62 @@
     </div>
 </div>
 
+
 <!-- INFORMACION -->
 <div class="modal fade" id="informacionUsuario" tabindex="-1" aria-labelledby="infoUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="infoUsuarioLabel">Información del Usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Usuario (DNI):</strong> <span id="infoDni"></span></p>
-                <p><strong>Localidad:</strong> <span id="infoLocalidad"></span></p>
-                <p><strong>Dirección:</strong> <span id="infoDireccion"></span></p>
-                <p><strong>Teléfono:</strong> <span id="infoTelefono"></span></p>
-                <p><strong>Rol:</strong> <span id="infoRol"></span></p>
-            </div>
+            <form id="infoUsuarioForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoUsuarioLabel">Información del Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <label for="infoDni" class="form-label">Usuario (DNI):</label>
+                        <input type="text" id="infoDni" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoNombre" class="form-label">Nombre:</label>
+                        <input type="text" id="infoNombre" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoApellido" class="form-label">Apellido:</label>
+                        <input type="text" id="infoApellido" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoLocalidad" class="form-label">Localidad:</label>
+                        <input type="text" id="infoLocalidad" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoDireccion" class="form-label">Dirección:</label>
+                        <input type="text" id="infoDireccion" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoCaracteristicaTelefono" class="form-label">Característica Teléfono:</label>
+                        <input type="text" id="infoCaracteristicaTelefono" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoNumeroTelefono" class="form-label">Número Teléfono:</label>
+                        <input type="text" id="infoNumeroTelefono" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoRol" class="form-label">Rol:</label>
+                        <input type="text" id="infoRol" class="form-control" disabled/>
+                    </div>
+                    <div class="mb-2">
+                        <label for="infoFechaContratoIngreso" class="form-label">Fecha de Contrato:</label>
+                        <input type="date" id="infoFechaContratoIngreso" class="form-control" disabled/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnModificar" >Modificar</button>
+                    <button type="submit" id="btnConfirmar" >Confirmar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
 
 <script src="~/js/usuarios.js"></script>
