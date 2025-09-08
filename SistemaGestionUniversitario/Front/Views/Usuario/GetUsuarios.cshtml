@@ -131,8 +131,9 @@
 
 
 <!-- INFORMACION -->
+<!-- INFORMACION -->
 <div class="modal fade" id="informacionUsuario" tabindex="-1" aria-labelledby="infoUsuarioLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <form id="infoUsuarioForm" method="post" asp-action="UpdateUsuario" asp-controller="Usuario">
                 @Html.AntiForgeryToken()
@@ -141,37 +142,39 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-2">
-                        <label for="infoDni" class="form-label">Usuario (DNI):</label>
-                        <input type="text" id="infoDni" name="dni" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="infoNombre" class="form-label">Nombre:</label>
-                        <input type="text" id="infoNombre" name="Nombre" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="infoApellido" class="form-label">Apellido:</label>
-                        <input type="text" id="infoApellido" name="Apellido" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="infoLocalidad" class="form-label">Localidad:</label>
-                        <input type="text" id="infoLocalidad" name="Localidad" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="infoDireccion" class="form-label">Dirección:</label>
-                        <input type="text" id="infoDireccion" name="Direccion" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="infoCaracteristicaTelefono" class="form-label">Característica Teléfono:</label>
-                        <input type="text" id="infoCaracteristicaTelefono" name="CaracteristicaTelefono" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="infoNumeroTelefono" class="form-label">Número Teléfono:</label>
-                        <input type="text" id="infoNumeroTelefono" name="NumeroTelefono" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label for="infoRol" class="form-label">Rol:</label>
-                        <input type="text" id="infoRol" class="form-control" disabled/>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="infoDni" class="form-label">Usuario (DNI):</label>
+                            <input type="text" id="infoDni" name="dni" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="infoNombre" class="form-label">Nombre:</label>
+                            <input type="text" id="infoNombre" name="Nombre" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="infoApellido" class="form-label">Apellido:</label>
+                            <input type="text" id="infoApellido" name="Apellido" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="infoLocalidad" class="form-label">Localidad:</label>
+                            <input type="text" id="infoLocalidad" name="Localidad" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="infoDireccion" class="form-label">Dirección:</label>
+                            <input type="text" id="infoDireccion" name="Direccion" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="infoCaracteristicaTelefono" class="form-label">Característica Teléfono:</label>
+                            <input type="text" id="infoCaracteristicaTelefono" name="CaracteristicaTelefono" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="infoNumeroTelefono" class="form-label">Número Teléfono:</label>
+                            <input type="text" id="infoNumeroTelefono" name="NumeroTelefono" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="infoRol" class="form-label">Rol:</label>
+                            <input type="text" id="infoRol" class="form-control" disabled />
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -182,6 +185,7 @@
         </div>
     </div>
 </div>
+
 
 
 <script src="~/js/usuarios.js"></script>
