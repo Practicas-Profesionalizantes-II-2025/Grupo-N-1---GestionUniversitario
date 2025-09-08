@@ -65,7 +65,6 @@ infoModal.addEventListener('show.bs.modal', function (event) {
     document.getElementById('infoLocalidad').value = button.getAttribute('data-localidad');
     document.getElementById('infoDireccion').value = button.getAttribute('data-direccion');
     document.getElementById('infoRol').value = button.getAttribute('data-rol');
-    document.getElementById('infoFechaContratoIngreso').value = button.getAttribute('data-fechaContratoIngreso');
 
     // Deshabilitar todos los inputs al abrir
     document.querySelectorAll('#infoUsuarioForm input').forEach(i => i.disabled = true);
@@ -73,7 +72,6 @@ infoModal.addEventListener('show.bs.modal', function (event) {
 
     // Asegurar que rol y fecha siempre estén deshabilitados
     document.getElementById('infoRol').disabled = true;
-    document.getElementById('infoFechaContratoIngreso').disabled = true;
 
     document.getElementById('infoUsuarioForm').setAttribute('method', 'post');
 
@@ -84,7 +82,7 @@ const btnModificar = document.getElementById('btnModificar');
 if (btnModificar) {
     btnModificar.addEventListener('click', function () {
         document.querySelectorAll('#infoUsuarioForm input').forEach(i => {
-            if (i.id !== 'infoDni' && i.id !== 'infoRol' && i.id !== 'infoFechaContratoIngreso') {
+            if (i.id !== 'infoDni' && i.id !== 'infoRol') {
                 i.disabled = false;
             }
         });
