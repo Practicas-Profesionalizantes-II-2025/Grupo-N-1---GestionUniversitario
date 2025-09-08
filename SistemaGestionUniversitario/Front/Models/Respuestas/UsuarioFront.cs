@@ -17,5 +17,6 @@ namespace Front.Models.Respuestas
 
         [Display(Name = "Rol")]
         public string RolUsuarioDescripcion { get; set; }
+        public DateTime FechaContratoIngreso { get; set; }
     }
 }
