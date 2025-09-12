@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Front.Models.Respuestas.InscripcionFront>
+
+@{
+    ViewData["Title"] = "GetInscripcionesAsistencia";
+    List<Front.Models.Respuestas.MateriaFront>? materias = ViewBag.Materias as List<Front.Models.Respuestas.MateriaFront>;
+}
+
+<div class="container">
+    <h3>Registro de Asistencias</h3>
+
+    <!-- Fecha -->
+    <div class="mb-3">
+        <label for="fechaAsistencia" class="form-label">Fecha</label>
+        <input type="date" class="form-control" id="fechaAsistencia">
+    </div>
+
+    <!-- lista materias-->
+    <form asp-action="GetInscripcionesAsistencia" method="get" class="mb-3">
+        <select name="nombreMateria" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+            <option value="">Seleccione una Materia</option>
+            @foreach (var materia in ViewBag.Materias)
+            {
+                <option value="@materia.Nombre"
+                        selected="@(ViewBag.SelectedMateria == materia.Nombre ? "selected" : null)">
+                    @materia.Nombre
+                </option>
+            }
+        </select>
+    </form>
+
+    <!-- Contenedor de alumnos -->
+    <div class="mb-3">
+        <h5>Alumnos</h5>
+        <div id="alumnosContainer" class="d-flex flex-wrap">
+            @foreach (var insc in Model)
+            {
+                <div class="alumno-card border rounded p-2 m-1">
+                    <label>
+                        @insc.NombreAlumno @insc.ApellidoAlumno
+                        <input type="checkbox" name="asistencias" value="@insc.ID" checked />
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="d-flex gap-2">
+        <button id="btnAceptar" class="btn btn-secondary">Aceptar</button>
+        <button id="btnCancelar" class="btn btn-secondary">Cancelar</button>
+    </div>
+</div>
