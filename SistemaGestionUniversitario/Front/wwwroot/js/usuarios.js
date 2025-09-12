@@ -66,9 +66,17 @@ infoModal.addEventListener('show.bs.modal', function (event) {
     document.getElementById('infoDireccion').value = button.getAttribute('data-direccion');
     document.getElementById('infoRol').value = button.getAttribute('data-rol');
 
-    // Deshabilitar todos los inputs al abrir
-    document.querySelectorAll('#infoUsuarioForm input').forEach(i => i.disabled = true);
-    document.getElementById('btnConfirmar').disabled = true;
+    // Al abrir el modal
+    document.querySelectorAll('#infoUsuarioForm input').forEach(i => {
+        // Solo deshabilito los que sí quiero bloquear
+        if (i.id !== 'infoDni' && i.id !== 'infoRol') {
+            i.disabled = true;
+        } else {
+            // Para DNI y Rol → los dejo readonly (así viajan en el form)
+            i.readOnly = true;
+            i.disabled = false;
+        }
+    });    document.getElementById('btnConfirmar').disabled = true;
 
     // Asegurar que rol y fecha siempre estén deshabilitados
     document.getElementById('infoRol').disabled = true;
@@ -148,5 +156,3 @@ document.addEventListener("DOMContentLoaded", function () {
     filtroRol.addEventListener("change", aplicarFiltros);
     ordenNombre.addEventListener("change", aplicarFiltros);
 });
-
-

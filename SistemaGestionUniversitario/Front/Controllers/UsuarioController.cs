@@ -21,18 +21,19 @@ namespace Front.Controllers
             _logger = logger;
         }
 
-    private readonly Dictionary<string, string> _nombresAmigables = new()
-    {
-        { "RolUsuarioDescripcion", "Rol" },
-        { "Nombre", "Nombre" },
-        { "Apellido", "Apellido" },
-        { "Direccion", "Dirección" },
-        { "Localidad", "Localidad" },
-        { "NumeroTelefono", "Teléfono" },
-        { "CaracteristicaTelefono", "Característica" },
-        { "DNI", "Usuario (DNI)" },
-        { "Password", "Contraseña" }
-    };
+        private readonly Dictionary<string, string> _nombresAmigables = new()
+        {
+            { "RolUsuarioDescripcion", "Rol" },
+            { "Nombre", "Nombre" },
+            { "Apellido", "Apellido" },
+            { "Direccion", "Dirección" },
+            { "Localidad", "Localidad" },
+            { "NumeroTelefono", "Teléfono" },
+            { "CaracteristicaTelefono", "Característica" },
+            { "DNI", "Usuario (DNI)" },
+            { "Password", "Contraseña" }
+        };
+
         // GET: /Usuario/GetUsuarios
         [Authorize(Roles = "Administrador")]
         [HttpGet]
@@ -245,7 +246,7 @@ namespace Front.Controllers
                         TempData["Error"] = "Ocurrió un error inesperado al actualizar el usuario.";
                     }
 
-                    return RedirectToAction("GetUsuarios"); // 👈 volvés al listado
+                    return RedirectToAction("GetUsuarios");
                 }
 
                 TempData["Success"] = "Usuario actualizado correctamente.";
