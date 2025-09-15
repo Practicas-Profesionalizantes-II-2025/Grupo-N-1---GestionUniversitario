@@ -65,7 +65,7 @@ namespace API.Controllers
         {
             try
             {
-                await _asistenciaLogic.AltaAsistencia(crearAsistenciaDTO.idInscripcion, crearAsistenciaDTO.idDiaHorarioMateria, crearAsistenciaDTO.Estado, crearAsistenciaDTO.Fecha);
+                await _asistenciaLogic.AltaAsistencia(crearAsistenciaDTO.idInscripcion, crearAsistenciaDTO.nombreMateria, crearAsistenciaDTO.Estado, crearAsistenciaDTO.Fecha);
 
                 return Ok();
             }
@@ -75,39 +75,42 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("{dniAlumno}/{nombreMateria}")]
-        public async Task<IActionResult> Modificar(string dniAlumno, string nombreMateria, [FromBody] ModificarAsistenciaDTO modificarAsistenciaDTO)
-        {
-            try
-            {
-                AsistenciaDTO asistenciaDTO = await _asistenciaLogic.ActualizarAsistencia(dniAlumno, nombreMateria, modificarAsistenciaDTO.Fecha, modificarAsistenciaDTO.Estado);
+        // ------ Se deja codigo por si se cambia la forma de tomar la asistencia, pero por el momento no se usa ------
+        #region
+        //[HttpPut("{dniAlumno}/{nombreMateria}")]
+        //public async Task<IActionResult> Modificar(string dniAlumno, string nombreMateria, [FromBody] ModificarAsistenciaDTO modificarAsistenciaDTO)
+        //{
+        //    try
+        //    {
+        //        AsistenciaDTO asistenciaDTO = await _asistenciaLogic.ActualizarAsistencia(dniAlumno, nombreMateria, modificarAsistenciaDTO.Fecha, modificarAsistenciaDTO.Estado);
 
-                if (asistenciaDTO == null)
-                {
-                    return NotFound();
-                }
+        //        if (asistenciaDTO == null)
+        //        {
+        //            return NotFound();
+        //        }
 
-                return Ok(asistenciaDTO);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { mensaje = ex.Message });
-            }       
-        }
+        //        return Ok(asistenciaDTO);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { mensaje = ex.Message });
+        //    }       
+        //}
 
-        [HttpDelete("{dniAlumno}/{nombreMateria}/{fecha}")]
-        public async Task<IActionResult> Eliminar(string dniAlumno, string nombreMateria, DateTime fecha)
-        {
-            try
-            {
-                await _asistenciaLogic.EliminarAsistencia(dniAlumno, nombreMateria, fecha);
+        //[HttpDelete("{dniAlumno}/{nombreMateria}/{fecha}")]
+        //public async Task<IActionResult> Eliminar(string dniAlumno, string nombreMateria, DateTime fecha)
+        //{
+        //    try
+        //    {
+        //        await _asistenciaLogic.EliminarAsistencia(dniAlumno, nombreMateria, fecha);
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex);
+        //    }
+        //}
+        #endregion
     }
 }

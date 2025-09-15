@@ -28,7 +28,7 @@ namespace Logica.Implementations
             _diaHorarioMateriaRepository = diaHorarioMateriaRepository;
         }
 
-        public async Task AltaAsistencia(int idinscripcion, int iddiahorariomateria, bool estado, DateTime fecha)
+        public async Task AltaAsistencia(int idinscripcion, string nombreMateria, bool estado, DateTime fecha)
         {
             List<string> camposErroneos = new List<string>();
 
@@ -42,95 +42,105 @@ namespace Logica.Implementations
                 throw new ArgumentException("Los siguientes campos son inválidos: ", string.Join(", ", camposErroneos));
             }
 
-            Asistencia? asistenciaExistente = (await _asistenciaRepository.FindByConditionAsync(p => p.IdDiaHorarioMateria == iddiahorariomateria && p.IdInscripcion == idinscripcion)).FirstOrDefault();
+            Asistencia? asistenciaExistente = (await _asistenciaRepository.FindByConditionAsync(p => p.Fecha == fecha && p.IdInscripcion == idinscripcion)).FirstOrDefault();
             if (asistenciaExistente != null)
             {
-                throw new InvalidOperationException("Ya existe una asistencia registrada para la misma materia, día y hora.");
+                asistenciaExistente.Estado = estado;
+
+                _asistenciaRepository.Update(asistenciaExistente);
+                await _asistenciaRepository.SaveAsync();
             }
-
-            Asistencia asistenciaNueva = new Asistencia()
+            else
             {
-                IdInscripcion = idinscripcion,
-                IdDiaHorarioMateria = iddiahorariomateria,
-                Estado = estado,
-                Fecha = fecha,
-            };
+                Asistencia asistenciaNueva = new Asistencia()
+                {
+                    IdInscripcion = idinscripcion,
+                    Estado = estado,
+                    Fecha = fecha,
+                };
 
-            await _asistenciaRepository.AddAsync(asistenciaNueva);
-            await _asistenciaRepository.SaveAsync();
+                await _asistenciaRepository.AddAsync(asistenciaNueva);
+                await _asistenciaRepository.SaveAsync();
+            }
         }
-        public async Task<AsistenciaDTO> ActualizarAsistencia(string dniAlumno, string nombreMateria, DateTime fecha, bool estado)
-        {
-            Alumno? alumnoExistente = (await _alumnoRepository.FindByConditionAsync(a => a.Usuario.DNI == dniAlumno)).SingleOrDefault();
-            if (alumnoExistente == null)
-            {
-                throw new InvalidOperationException("No se encontró un alumno con ese DNI.");
-            }
 
-            Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(m => m.Nombre == nombreMateria)).SingleOrDefault();
-            if (materiaExistente == null)
-            {
-                throw new InvalidOperationException("No se encontró la materia.");
-            }
+        // ------ Se deja codigo por si se cambia la forma de tomar la asistencia, pero por el momento no se usa ------
+        #region
+        //public async Task<AsistenciaDTO> ActualizarAsistencia(string dniAlumno, string nombreMateria, DateTime fecha, bool estado)
+        //{
+        //    Alumno? alumnoExistente = (await _alumnoRepository.FindByConditionAsync(a => a.Usuario.DNI == dniAlumno)).SingleOrDefault();
+        //    if (alumnoExistente == null)
+        //    {
+        //        throw new InvalidOperationException("No se encontró un alumno con ese DNI.");
+        //    }
 
-            Inscripcion? inscripcionExistente = (await _inscripcionRepository.FindByConditionAsync(i => i.IdAlumno == alumnoExistente.ID && i.IdMateria == materiaExistente.ID)).SingleOrDefault();
-            if (inscripcionExistente == null)
-            {
-                throw new InvalidOperationException("El alumno no está inscripto en esa materia.");
-            }
+        //    Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(m => m.Nombre == nombreMateria)).SingleOrDefault();
+        //    if (materiaExistente == null)
+        //    {
+        //        throw new InvalidOperationException("No se encontró la materia.");
+        //    }
 
-            Asistencia? asistenciaExistente = (await _asistenciaRepository.FindByConditionAsync(a => a.Fecha == fecha && a.IdInscripcion == inscripcionExistente.ID)).SingleOrDefault();
-            if (asistenciaExistente == null)
-            {
-                throw new InvalidOperationException("No se encontró la asistencia para ese día.");
-            }
+        //    Inscripcion? inscripcionExistente = (await _inscripcionRepository.FindByConditionAsync(i => i.IdAlumno == alumnoExistente.ID && i.IdMateria == materiaExistente.ID)).SingleOrDefault();
+        //    if (inscripcionExistente == null)
+        //    {
+        //        throw new InvalidOperationException("El alumno no está inscripto en esa materia.");
+        //    }
 
-            asistenciaExistente.Estado = estado;
+        //    Asistencia? asistenciaExistente = (await _asistenciaRepository.FindByConditionAsync(a => a.Fecha == fecha && a.IdInscripcion == inscripcionExistente.ID)).SingleOrDefault();
+        //    if (asistenciaExistente == null)
+        //    {
+        //        throw new InvalidOperationException("No se encontró la asistencia para ese día.");
+        //    }
 
-            _asistenciaRepository.Update(asistenciaExistente);
-            await _asistenciaRepository.SaveAsync();
+        //    asistenciaExistente.Estado = estado;
 
-            var asistenciaDTO = new AsistenciaDTO
-            {
-                ID = asistenciaExistente.ID,
-                DniAlumno = alumnoExistente.Usuario.DNI,
-                NombreMateria = materiaExistente.Nombre,
-                Estado = asistenciaExistente.Estado,
-                Fecha = asistenciaExistente.Fecha
-            };
+        //    _asistenciaRepository.Update(asistenciaExistente);
+        //    await _asistenciaRepository.SaveAsync();
 
-            return asistenciaDTO;
-        }
-        public async Task EliminarAsistencia(string dniAlumno, string nombreMateria, DateTime fecha)
-        {
-            Alumno? alumnoExistente = (await _alumnoRepository.FindByConditionAsync(a => a.Usuario.DNI == dniAlumno)).SingleOrDefault();
-            if (alumnoExistente == null)
-            {
-                throw new InvalidOperationException("No se encontró un alumno con ese DNI.");
-            }
+        //    var asistenciaDTO = new AsistenciaDTO
+        //    {
+        //        ID = asistenciaExistente.ID,
+        //        DniAlumno = alumnoExistente.Usuario.DNI,
+        //        NombreMateria = materiaExistente.Nombre,
+        //        Estado = asistenciaExistente.Estado,
+        //        Fecha = asistenciaExistente.Fecha
+        //    };
 
-            Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(m => m.Nombre == nombreMateria)).SingleOrDefault();
-            if (materiaExistente == null)
-            {
-                throw new InvalidOperationException("No se encontró la materia.");
+        //    return asistenciaDTO;
+        //}
 
-            }
+        //public async Task EliminarAsistencia(string dniAlumno, string nombreMateria, DateTime fecha)
+        //{
+        //    Alumno? alumnoExistente = (await _alumnoRepository.FindByConditionAsync(a => a.Usuario.DNI == dniAlumno)).SingleOrDefault();
+        //    if (alumnoExistente == null)
+        //    {
+        //        throw new InvalidOperationException("No se encontró un alumno con ese DNI.");
+        //    }
 
-            Inscripcion? inscripcionExistente = (await _inscripcionRepository.FindByConditionAsync(i => i.IdAlumno == alumnoExistente.ID && i.IdMateria == materiaExistente.ID)).SingleOrDefault();
-            if (inscripcionExistente == null)
-            {
-                throw new InvalidOperationException("El alumno no está inscripto en esa materia.");
-            }
+        //    Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(m => m.Nombre == nombreMateria)).SingleOrDefault();
+        //    if (materiaExistente == null)
+        //    {
+        //        throw new InvalidOperationException("No se encontró la materia.");
 
-            Asistencia? asistenciaExistente = (await _asistenciaRepository.FindByConditionAsync(a => a.Fecha == fecha && a.IdInscripcion == inscripcionExistente.ID)).SingleOrDefault();
-            if (asistenciaExistente == null)
-            {
-                throw new InvalidOperationException("No se encontró la asistencia para ese día.");
-            }
+        //    }
 
-            _asistenciaRepository.Remove(asistenciaExistente);
-            await _asistenciaRepository.SaveAsync();
-        }
+        //    Inscripcion? inscripcionExistente = (await _inscripcionRepository.FindByConditionAsync(i => i.IdAlumno == alumnoExistente.ID && i.IdMateria == materiaExistente.ID)).SingleOrDefault();
+        //    if (inscripcionExistente == null)
+        //    {
+        //        throw new InvalidOperationException("El alumno no está inscripto en esa materia.");
+        //    }
+
+        //    Asistencia? asistenciaExistente = (await _asistenciaRepository.FindByConditionAsync(a => a.Fecha == fecha && a.IdInscripcion == inscripcionExistente.ID)).SingleOrDefault();
+        //    if (asistenciaExistente == null)
+        //    {
+        //        throw new InvalidOperationException("No se encontró la asistencia para ese día.");
+        //    }
+
+        //    _asistenciaRepository.Remove(asistenciaExistente);
+        //    await _asistenciaRepository.SaveAsync();
+        //}
+        #endregion
+
         public async Task<List<AsistenciaDTO>> ObtenerAsistenciasPorMateria(string nombreMateria)
         {
             // 1. Buscar la materia

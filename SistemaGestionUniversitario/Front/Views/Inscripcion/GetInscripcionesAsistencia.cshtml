@@ -8,25 +8,26 @@
 <div class="container">
     <h3>Registro de Asistencias</h3>
 
-    <!-- Fecha -->
-    <div class="mb-3">
-        <label for="fechaAsistencia" class="form-label">Fecha</label>
-        <input type="date" class="form-control" id="fechaAsistencia">
-    </div>
+    <div class="d-flex align-items-center mb-3">
+        <!-- Fecha -->
+        <div class="me-3">
+            <input type="date" class="form-control" id="fechaAsistencia">
+        </div>
 
-    <!-- lista materias-->
-    <form asp-action="GetInscripcionesAsistencia" method="get" class="mb-3">
-        <select name="nombreMateria" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
-            <option value="">Seleccione una Materia</option>
-            @foreach (var materia in ViewBag.Materias)
-            {
-                <option value="@materia.Nombre"
-                        selected="@(ViewBag.SelectedMateria == materia.Nombre ? "selected" : null)">
-                    @materia.Nombre
-                </option>
-            }
-        </select>
-    </form>
+        <!-- lista materias-->
+        <form asp-action="GetInscripcionesAsistencia" method="get">
+            <select name="nombreMateria" id="materia" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+                <option value="">Seleccione una Materia</option>
+                @foreach (var materia in ViewBag.Materias)
+                {
+                    <option value="@materia.Nombre"
+                            selected="@(ViewBag.SelectedMateria == materia.Nombre ? "selected" : null)">
+                        @materia.Nombre
+                    </option>
+                }
+            </select>
+        </form>
+    </div>
 
     <!-- Contenedor de alumnos -->
     <div class="mb-3">
@@ -37,7 +38,7 @@
                 <div class="alumno-card border rounded p-2 m-1">
                     <label>
                         @insc.NombreAlumno @insc.ApellidoAlumno
-                        <input type="checkbox" name="asistencias" value="@insc.ID" checked />
+                        <input type="checkbox" class="asistencia" name="asistencias" value="@insc.ID" checked />
                     </label>
                 </div>
             }
@@ -45,8 +46,54 @@
     </div>
 
     <!-- Botones -->
-    <div class="d-flex gap-2">
-        <button id="btnAceptar" class="btn btn-secondary">Aceptar</button>
-        <button id="btnCancelar" class="btn btn-secondary">Cancelar</button>
+    <div class="mb-3 d-flex justify-content-end">
+
+        <button type="button"
+                id="btnAbrirModal"
+                class="btn btn-secondary me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#confirmarAsistenciasModal">
+                Aceptar
+        </button>
+
+        <button id="btnCancelar" type="button" class="btn btn-secondary">Cancelar</button>
     </div>
 </div>
+
+<!-- MODAL ACEPTAR -->
+<form id="confirmForm" asp-action="CreateAsistencia" asp-controller="Asistencia" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="modal fade" id="confirmarAsistenciasModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- HEADER -->
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Asistencias</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+                    <p id="confirmMessage">¿Desea confirmar las asistencias?</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmCheckbox">
+                        <label class="form-check-label" for="confirmCheckbox">
+                            Confirmar
+                        </label>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary" id="btnAceptarFinal" disabled>Aceptar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="~/js/asistencias.js"></script>
