@@ -103,11 +103,11 @@
                     <li class="nav-item"><a class="nav-link" href="#">Calendario Académico</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Control de Asistencia
+                            Control de Asistencias
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/Inscripcion/GetInscripcionesAsistencia">Asistencias</a></li>
-                            <li><a class="dropdown-item" href="#">Inasistencias</a></li>
+                            <li><a class="dropdown-item" href="/Asistencia/GetAsistenciasMateria">Registro</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -164,7 +164,7 @@
         </div>
     </nav>
 
-    <div class="container mt-3">
+    @* <div class="container mt-3">
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -180,6 +180,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
+    </div> *@
 
     <div>
             <div class="container mt-4" style="padding-top: 70px;">

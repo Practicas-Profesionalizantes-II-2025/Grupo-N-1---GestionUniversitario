@@ -180,7 +180,10 @@ namespace Logica.Implementations
                     DniAlumno = alumno.Usuario.DNI,
                     NombreMateria = materia.Nombre,
                     Estado = asistencia.Estado,
-                    Fecha = asistencia.Fecha
+                    Fecha = asistencia.Fecha,
+                    NombreAlumno = alumno.Usuario.Nombre,
+                    ApellidoAlumno = alumno.Usuario.Apellido,
+                    IdInscripcion = inscripcion.ID
                 };
 
                 resultado.Add(asistenciaDTO);
