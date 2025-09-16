@@ -1,0 +1,120 @@
+﻿@model IEnumerable<Front.Models.Respuestas.AsistenciaFront>
+
+@{
+    ViewData["Title"] = "Editar Asistencias";
+    List<Front.Models.Respuestas.MateriaFront>? materias = ViewBag.Materias as List<Front.Models.Respuestas.MateriaFront>;
+    string? selectedMateria = ViewBag.SelectedMateria as string;
+}
+
+<div class="container">
+    
+    <h3>Registro de Asistencias</h3>
+
+    <!-- Selección de Materia -->
+    <form asp-action="GetAsistenciasMateria" method="get" class="mb-3">
+        <select name="nombreMateria" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
+            <option value="">Seleccione una Materia</option>
+            @if (materias != null)
+            {
+                foreach (var materia in materias)
+                {
+                    <option value="@materia.Nombre"
+                            selected="@(selectedMateria == materia.Nombre ? "selected" : null)">
+                        @materia.Nombre
+                    </option>
+                }
+            }
+        </select>
+    </form>
+
+    @if (!string.IsNullOrEmpty(selectedMateria))
+    {
+        if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                No hay asistencias registradas para esta materia.
+            </div>
+        }
+        else
+        {
+            <form id="asistenciasForm" asp-action="ModAsistencia" asp-controller="Asistencia" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="nombreMateria" value="@selectedMateria" />
+
+                <div class="accordion" id="accordionAsistencias">
+                    @{
+                        int i = 0;
+                    }
+                    @foreach (var grupo in Model.GroupBy(a => a.Fecha.Date))
+                    {
+                        var fechaId = grupo.Key.ToString("yyyyMMdd");
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading-@fechaId">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-@fechaId"
+                                        aria-expanded="false"
+                                        aria-controls="collapse-@fechaId">
+                                    📅 @grupo.Key.ToString("dd/MM/yyyy")
+                                </button>
+                            </h2>
+                            <div id="collapse-@fechaId" class="accordion-collapse collapse"
+                                 aria-labelledby="heading-@fechaId" data-bs-parent="#accordionAsistencias">
+                                <div class="accordion-body">
+                                    @foreach (var asistencia in grupo)
+                                    {
+                                        <div class="form-check">
+                                            <input type="checkbox"
+                                                   class="form-check-input"
+                                                   name="asistencias[@i].Estado"
+                                                   value="true"
+                                            @(asistencia.Estado ? "checked" : "") />
+                                            <input type="hidden" name="asistencias[@i].IdInscripcion" value="@asistencia.IdInscripcion" />
+                                            <input type="hidden" name="asistencias[@i].NombreMateria" value="@asistencia.NombreMateria" />
+                                            <input type="hidden" name="asistencias[@i].Fecha" value="@asistencia.Fecha.ToString("yyyy-MM-dd")" />
+                                            <label class="form-check-label">@asistencia.NombreAlumno @asistencia.ApellidoAlumno</label>
+                                        </div>
+                                        i++;
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Botones -->
+                <div class="mb-3 d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#confirmarAsistenciasModal">
+                        Aceptar
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+                </div>
+
+                <!-- MODAL DENTRO DEL MISMO FORM -->
+                <div class="modal fade" id="confirmarAsistenciasModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirmar Asistencias</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¿Desea confirmar las asistencias?</p>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="confirmCheckbox">
+                                    <label class="form-check-label" for="confirmCheckbox">Confirmar</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-secondary" id="btnAceptarFinal" disabled>Aceptar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        }
+    }
+</div>
+
+<script src="~/js/asistencias.js"></script>

@@ -2,6 +2,7 @@
 using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Security.Claims;
 
 namespace Front.Controllers
@@ -18,7 +19,7 @@ namespace Front.Controllers
         }
 
         // GET: /Inscripcion/GetInscripcionMateria/nombreMateria
-        [Authorize(Roles = "Administrador, Profesor")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<IActionResult> GetInscripcionMateria(string nombreMateria)
         {
@@ -47,6 +48,38 @@ namespace Front.Controllers
             }
         }
 
+        // GET: /Inscripcion/GetInscripcionMateria/nombreMateria
+        [Authorize(Roles = "Profesor")]
+        [HttpGet]
+        public async Task<IActionResult> GetInscripcionesAsistencia(string nombreMateria)
+        {
+            try
+            {
+                // Profesor Logueado
+                string? dniUsuarioLogueado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                // Todas las materias para el listado
+                ViewBag.Materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>($"Materia/DNIProfesor/{dniUsuarioLogueado}") ?? new List<MateriaFront>();
+
+                // Guardo la materia seleccionada (puede ser null si recién entra a la vista)
+                ViewBag.SelectedMateria = nombreMateria;
+
+                // Traer inscripciones de la materia seleccionada
+                List<InscripcionFront>? inscripciones = new List<InscripcionFront>();
+                if (!string.IsNullOrEmpty(nombreMateria))
+                {
+                    inscripciones = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>($"Inscripcion/PorMateria/{nombreMateria}");
+                }
+
+                return View(inscripciones);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener inscripciones por nombre de materia");
+                TempData["Error"] = "Ocurrió un error al buscar inscripciones. Intente nuevamente.";
+                return RedirectToAction("GetInscripcionesAsistencia");
+            }
+        }
 
         // GET: /Inscripcion/GetInscripcionesDNI/DNI
         [Authorize(Roles = "Alumno")]

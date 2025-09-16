@@ -51,12 +51,12 @@ namespace API.Controllers
             }     
         }
 
-        [HttpGet("DNIProfesor/{nombreMateria}")]
-        public async Task<IActionResult> GetMateriasDNIProfesor(string dni)
+        [HttpGet("DNIProfesor/{dniProfesor}")]
+        public async Task<IActionResult> GetMateriasDNIProfesor(string dniProfesor)
         {
             try
             {
-                List<MateriaDTO> materiasDTO = await _materiaLogic.ObtenerMateriasDNIProfesor(dni);
+                List<MateriaDTO> materiasDTO = await _materiaLogic.ObtenerMateriasDNIProfesor(dniProfesor);
 
                 if (materiasDTO == null)
                 {
