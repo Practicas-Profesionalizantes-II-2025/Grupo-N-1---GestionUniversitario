@@ -1,27 +1,106 @@
 ﻿@model Front.Models.Crear.CrearUsuarioLogInFront
-
 @{
-    Layout = null;
+    Layout = null; // Ignoramos el layout global SOLO en esta vista
 }
-
 @{
     ViewData["Title"] = "LogIn";
 }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Iniciar Sesión</title>
 
-<h3>Iniciar Sesión</h3>
+<!-- Bootstrap -->
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
-<form asp-action="LogIn" method="post">
-    @Html.AntiForgeryToken()
-    <div class="mb-3">
-        <label class="form-label">Usuario</label>
-        <input asp-for="Usuario" class="form-control" autocomplete="username" />
-        <span asp-validation-for="Usuario" class="text-danger"></span>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #1a1a1a, #333, #4d4d4d, #666);
+        background-size: 300% 300%;
+        animation: gradientBG 12s ease infinite;
+    }
+
+    /* Tarjeta tipo glassmorphism */
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    /* Mantener proporciones del SVG en todos los dispositivos */
+    .svg-container {
+        width: 214px;
+        margin: 0 auto;
+    }
+
+        .svg-container svg {
+            width: 214px;
+            height: 75px;
+        }
+
+    /* Mejora de legibilidad en inputs */
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+    /* Animación del fondo */
+    @@keyframes gradientBG {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+</style>
+<div class="login-container d-flex justify-content-center align-items-center">
+    <div class="card login-card shadow-lg p-4 rounded-4">
+        <div class="text-center mb-4">
+            <div class="svg-container">
+                <svg width="214" height="75" viewBox="0 0 314 175" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M237 56L293.5 95.5L278 172H172L162.5 163" stroke="#dee2e6" " stroke-width="6" />
+                    <path d="M179 95.5L219 121L214 134.5H237L243 121L185 77.5" stroke="#dee2e6" stroke-width="6" />
+                    <path d="M114 172H11.5L4 158.5L32 29.5L11.5 3H85L56 134H80L107 17.5M114 172L141.5 40.5H126L107 17.5M114 172H160L191.5 40.5L187.787 56H237L239.925 40.5M107 17.5L93.5 3H247M247 3H298.5L310.5 17.5L298.5 78.5L256.5 56L261 40.5H239.925M247 3L239.925 40.5" stroke="#dee2e6" stroke-width="6" />
+                </svg>
+            </div>
+            
+            <h3 class="fw-bold text-white" style="margin: 40px 0 0 0">Iniciar Sesión</h3>
+        </div>
+
+        <form asp-action="LogIn" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="Usuario" class="form-label text-white-50">Usuario</label>
+                <input asp-for="Usuario" class="form-control bg-transparent text-white border-light" autocomplete="username" />
+                <span asp-validation-for="Usuario" class="text-warning"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label text-white-50">Contraseña</label>
+                <input asp-for="Password" type="password" class="form-control bg-transparent text-white border-light" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="text-warning"></span>
+            </div>
+
+            <div asp-validation-summary="ModelOnly" class="text-warning mb-3"></div>
+
+            <button type="submit" class="btn btn-primary w-100 rounded-pill">Ingresar</button>
+        </form>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Contraseña</label>
-        <input asp-for="Password" type="password" class="form-control" autocomplete="current-password" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <button type="submit" class="btn btn-primary">Ingresar</button>
-</form>
+</div>
+
+
+
