@@ -1,4 +1,5 @@
 ﻿using Front.Models.Crear;
+using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -14,6 +15,27 @@ namespace Front.Controllers
         {
             _httpClient = httpClientFactory.CreateClient("ApiPrincipal");
             _logger = logger;
+        }
+
+        // GET: /Asistencia/GetInasistenciaDNI/dni
+        [Authorize(Roles = "Alumno")]
+        [HttpGet]
+        public async Task<IActionResult> GetInasistenciaDNI()
+        {
+            try
+            {
+                // Alumno Logueado
+                string? dniUsuarioLogueado = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                List<AsistenciaFront>? asistencias = await _httpClient.GetFromJsonAsync<List<AsistenciaFront>>($"Asistencia/DNI/{dniUsuarioLogueado}");
+
+                return View(asistencias);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener inasistencias por DNI");
+                return RedirectToAction("Index");
+            }
         }
 
         // POST: /Asistencia

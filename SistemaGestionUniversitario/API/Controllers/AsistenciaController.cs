@@ -48,7 +48,7 @@ namespace API.Controllers
 
                 if (asistenciaDTO.Count == 0)
                 {
-                    return NoContent();
+                    return Ok(new List<AsistenciaDTO>());
                 }
 
                 return Ok(asistenciaDTO);
