@@ -10,20 +10,43 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
 });
 
 // Eliminar materia con confirmación
-async function deleteMateria(nombreMateria) {
-    if (confirm("¿Estás seguro que quieres eliminar la materia " + nombreMateria + "?")) {
-        const response = await fetch(`/Materia/${nombreMateria}`, {method: "DELETE"});
+let materiaToDelete = "";
 
-        if (response.ok) {
-            const msg = await response.text();
-            alert(msg);
-            location.reload();
-        } else {
-            const error = await response.text();
-            alert("Error al eliminar la materia: " + error);
-        }
-    }
+function deleteMateria(nombreMateria) {
+    materiaToDelete = nombreMateria;
+    document.getElementById("deleteMateriaNombre").textContent = nombreMateria;
+    const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    deleteModal.show();
 }
+
+document.getElementById("btnConfirmDelete").addEventListener("click", async () => {
+    if (!materiaToDelete) return;
+
+    try {
+        const response = await fetch(`/Materia/${materiaToDelete}`, { method: "DELETE" });
+        const data = await response.json(); // <- aquí recibimos el JSON
+
+        // Mostrar mensaje dentro del modal
+        document.getElementById("messageModalTitle").textContent = response.ok ? "Éxito" : "Error";
+        document.getElementById("messageModalBody").textContent = data.message || "Ocurrió un error";
+        const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        messageModal.show();
+
+        // Cerrar modal de confirmación
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+        deleteModal.hide();
+
+        // Opcional: recargar después de cerrar el mensaje
+        messageModal._element.addEventListener('hidden.bs.modal', () => {
+            if (response.ok) location.reload();
+        });
+
+    } catch (err) {
+        console.error(err);
+    }
+
+    materiaToDelete = "";
+});
 
 // Mas Información
 
