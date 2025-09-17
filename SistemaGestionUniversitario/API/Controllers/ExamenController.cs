@@ -48,7 +48,7 @@ namespace API.Controllers
         {
             try
             {
-                await _examenLogic.AltaExamen(crearExamenDTO.NombreMateria, crearExamenDTO.DescripcionDiaHorario, crearExamenDTO.TipoExamen);
+                await _examenLogic.AltaExamen(crearExamenDTO.NombreMateria, crearExamenDTO.DescripcionDiaHorario, crearExamenDTO.Tipo);
 
                 return Ok();
             }

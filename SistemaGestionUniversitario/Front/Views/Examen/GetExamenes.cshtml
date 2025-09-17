@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Front.Models.Respuestas.ExamenFront>
+
+@{
+    ViewData["Title"] = "GetExamenes";
+}
+
+<div class="container mt-4">
+    <!-- buscador, filtro y botones de crear y modificar -->
+    <div class="d-flex justify-content-between mb-3">
+        <div class="d-flex align-items-center">
+            <input type="text" id="searchBox" class="form-control me-2" placeholder="Buscar..." style="width: 250px; height: 48px;">
+            <div class="dropdown me-2">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="btnFiltro" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel"></i> Filtro
+                </button>
+                <ul class="dropdown-menu p-3" aria-labelledby="btnFiltro" style="min-width:180px;">
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Parcial" id="chkParcial">
+                        <label class="form-check-label" for="chkParcial">Parcial</label>
+                    </li>
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Final" id="chkFinal">
+                        <label class="form-check-label" for="chkFinal">Final</label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <a asp-controller="Examen" asp-action="CreateExamen" class="btn btn-secondary">Crear examen</a>
+        </div>
+    </div>
+
+
+    <!-- tabla de usuarios-->
+    <table class="tablas" id="tablaExamenes">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tipo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NombreMateria)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DescripcionDiaHorario)
+                </th>
+                <th>
+                    Eliminar
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var examen in Model)
+            {
+                <tr>
+                    <td>@examen.Tipo</td>
+                    <td>@examen.NombreMateria</td>
+                    <td>@examen.DescripcionDiaHorario</td>
+                    <td class=" acciones eliminar d-flex justify-content-center align-items-center">
+                        <!-- Botón borrar -->
+                        <button type="button"
+                                class="btn btn-sm btn-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteModal"
+                                data-tipoExamen="@examen.Tipo"
+                                data-nombreMateria="@examen.NombreMateria"
+                                data-descripcionDiaHorario="@examen.DescripcionDiaHorario">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<!-- ELIMINAR -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteLabel">Eliminar Examen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">¿Desea eliminar al examen seleccionado?</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="confirmCheckbox">
+                    <label class="form-check-label" for="confirmCheckbox">
+                        Confirmar
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" id="btnAceptar" disabled>Aceptar</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/examenes.js"></script>

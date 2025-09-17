@@ -129,6 +129,7 @@ namespace Logica.Implementations
                     listaExamenesDTO.Add(new ExamenDTO()
                     {
                         ID = examen.ID,
+                        Tipo=examen.Tipo,
                         NombreMateria = examen.Materia.Nombre,
                         DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examen.DiaHorario.IdDia, examen.DiaHorario.IdHorario)
                     });
@@ -151,6 +152,7 @@ namespace Logica.Implementations
                 listaExamenesDTO.Add(new ExamenDTO()
                 {
                     ID = examen.ID,
+                    Tipo = examen.Tipo,
                     NombreMateria = examen.Materia.Nombre,
                     DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examen.DiaHorario.IdDia, examen.DiaHorario.IdHorario)
                 });

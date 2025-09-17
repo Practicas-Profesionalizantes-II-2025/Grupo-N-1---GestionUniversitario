@@ -127,7 +127,6 @@ namespace Front.Controllers
         public async Task<IActionResult> CreateUsuario()
         {
             List<RolUsuarioFront>? rolesUsuario = await _httpClient.GetFromJsonAsync<List<RolUsuarioFront>>("RolUsuario");
-
             ViewBag.Roles = new SelectList(rolesUsuario, "Descripcion", "Descripcion");
             return View();
         }
