@@ -48,7 +48,7 @@ namespace API.Controllers
         {
             try
             {
-                await _examenLogic.AltaExamen(crearExamenDTO.NombreMateria, crearExamenDTO.DescripcionDiaHorario, crearExamenDTO.Tipo);
+                await _examenLogic.AltaExamen(crearExamenDTO.NombreMateria, crearExamenDTO.DescripcionDiaHorario, crearExamenDTO.Tipo, crearExamenDTO.Fecha);
 
                 return Ok();
             }
@@ -59,14 +59,15 @@ namespace API.Controllers
         }
 
         [HttpPut("{nombreMateria}/{descripcionDiaHorario}")]
-        public async Task<IActionResult> Modificar(string nombreMateria, string descripcionDiaHorario, [FromBody] ModificarExamenDTO modificarExamenDTO)
+        public async Task<IActionResult> Modificar(string nombreMateria, string descripcionDiaHorario, DateTime fecha,[FromBody] ModificarExamenDTO modificarExamenDTO)
         {
             try
             {
                 ExamenDTO examenDTO = await _examenLogic.ActualizacionExamen(
                 nombreMateria,
                 descripcionDiaHorario,
-                modificarExamenDTO.IDNuevoDiaHorario);
+                modificarExamenDTO.IDNuevoDiaHorario,
+                fecha);
 
                 if (examenDTO == null)
                 {
@@ -82,11 +83,11 @@ namespace API.Controllers
         }
 
         [HttpDelete("{nombreMateria}/{descripcionDiaHorario}")]
-        public async Task<IActionResult> EliminarPorID(string nombreMateria, string descripcionDiaHorario)
+        public async Task<IActionResult> EliminarPorID(string nombreMateria, string descripcionDiaHorario, DateTime fecha)
         {
             try
             {
-                await _examenLogic.BajaExamen(nombreMateria, descripcionDiaHorario);
+                await _examenLogic.BajaExamen(nombreMateria, descripcionDiaHorario,fecha);
 
                 return Ok("El examen se elimino correctamente.");
             }

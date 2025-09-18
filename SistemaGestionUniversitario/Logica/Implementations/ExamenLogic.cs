@@ -21,7 +21,7 @@ namespace Logica.Implementations
             _diaHorarioLogic = diaHorarioLogic;
         }
 
-        public async Task AltaExamen(string nombreMateria, string descripcionDiaHorario, string tipoExamen)
+        public async Task AltaExamen(string nombreMateria, string descripcionDiaHorario, string tipoExamen, DateTime fechaExistente)
         {
             Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(m => m.Nombre == nombreMateria)).FirstOrDefault();
             DiaHorario? diaHorarioExistente = await _diaHorarioLogic.ObtenerDiaHorarioPorDescripcionUsoInterno(descripcionDiaHorario);
@@ -40,6 +40,10 @@ namespace Logica.Implementations
             {
                 throw new ArgumentNullException("El tipo de examen no es valido.");
             }
+            if (fechaExistente == null)
+            {
+                throw new ArgumentNullException("El examen debe estar vinculado a una fecha.");
+            }
 
             Examen? examenExistente = (await _examenRepository.FindByConditionAsync(p => p.Materia == materiaExistente && p.DiaHorario == diaHorarioExistente)).FirstOrDefault();
             
@@ -52,13 +56,14 @@ namespace Logica.Implementations
             {
                 Tipo = tipoExamen,
                 Materia = materiaExistente,
-                DiaHorario = diaHorarioExistente
+                DiaHorario = diaHorarioExistente,
+                Fecha = fechaExistente
             };
 
             await _examenRepository.AddAsync(examenNuevo);
             await _examenRepository.SaveAsync();
         }
-        public async Task<ExamenDTO> ActualizacionExamen(string nombreMateria, string descripcionDiaHorario, int idNuevoDiaHorario)
+        public async Task<ExamenDTO> ActualizacionExamen(string nombreMateria, string descripcionDiaHorario, int idNuevoDiaHorario, DateTime fecha)
         {
             DiaHorario? diaHorario = await _diaHorarioLogic.ObtenerDiaHorarioPorDescripcionUsoInterno(descripcionDiaHorario);
             if (diaHorario == null)
@@ -79,7 +84,11 @@ namespace Logica.Implementations
             {
                 throw new ArgumentNullException("El dia y horario al que se quiere cambiar el examen no existe.");
             }
-            
+            if (fecha == null)
+            {
+                throw new ArgumentNullException("La fecha que se quiere actualizar no existe.");
+            }
+
             examenExistente.DiaHorario = nuevoDiaHorario;
 
             _examenRepository.Update(examenExistente);
@@ -89,12 +98,13 @@ namespace Logica.Implementations
             {
                 ID = examenExistente.ID,
                 NombreMateria = examenExistente.Materia.Nombre,
-                DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examenExistente.DiaHorario.IdDia, examenExistente.DiaHorario.IdHorario)
+                DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examenExistente.DiaHorario.IdDia, examenExistente.DiaHorario.IdHorario),
+                Fecha = fecha
             };
 
             return examenExistenteDTO;
         }
-        public async Task BajaExamen(string nombreMateria, string descripcionDiaHorario)
+        public async Task BajaExamen(string nombreMateria, string descripcionDiaHorario, DateTime fecha)
         {
             DiaHorario? diaHorario = await _diaHorarioLogic.ObtenerDiaHorarioPorDescripcionUsoInterno(descripcionDiaHorario);
             if (diaHorario == null)
@@ -131,7 +141,8 @@ namespace Logica.Implementations
                         ID = examen.ID,
                         Tipo=examen.Tipo,
                         NombreMateria = examen.Materia.Nombre,
-                        DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examen.DiaHorario.IdDia, examen.DiaHorario.IdHorario)
+                        DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examen.DiaHorario.IdDia, examen.DiaHorario.IdHorario),
+                        Fecha = examen.Fecha,
                     });
                 }
 
@@ -154,7 +165,8 @@ namespace Logica.Implementations
                     ID = examen.ID,
                     Tipo = examen.Tipo,
                     NombreMateria = examen.Materia.Nombre,
-                    DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examen.DiaHorario.IdDia, examen.DiaHorario.IdHorario)
+                    DescripcionDiaHorario = await _diaHorarioLogic.ObtenerDescripcionDiaHorarioPorIDsUsoInterno(examen.DiaHorario.IdDia, examen.DiaHorario.IdHorario),
+                    Fecha = examen.Fecha,
                 });
             }
 

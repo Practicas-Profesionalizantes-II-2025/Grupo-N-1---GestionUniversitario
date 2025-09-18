@@ -10,7 +10,9 @@ namespace Front.Models.Respuestas
         public string Tipo { get; set; }
         [Display(Name = "Nombre Materia")]
         public string NombreMateria { get; set; }
-        [Display(Name = "Fecha")]
+        [Display(Name = "Horario")]
         public string DescripcionDiaHorario { get; set; }
+
+        public DateTime Fecha { get; set; }
     }
 }

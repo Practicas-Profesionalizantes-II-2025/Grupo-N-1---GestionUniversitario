@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Front.Controllers
@@ -55,17 +58,26 @@ namespace Front.Controllers
 
         // POST: /Examen/CreateExamen
         [Authorize(Roles = "Profesor")]
-
         [HttpPost]
-        public async Task<IActionResult> CreateExamen(CrearExamenFront examen)
+        public async Task<IActionResult> CreateExamen(CrearExamenFront examen, string DescripcionDiaHorario)
         {
+
+            // Obtener el día de la semana como texto (Lunes, Martes, etc.)
+            string diaSemana = examen.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES"));
+
+            // Combinar con el horario seleccionado
+            examen.DescripcionDiaHorario = $"{examen.Fecha.ToString("dddd", new CultureInfo("es-ES"))} {DescripcionDiaHorario}";
 
             var response = await _httpClient.PostAsJsonAsync("Examen", examen);
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Error al crear examen");
-                return View();
+                // Recargar ViewBag para volver a mostrar el formulario
+                ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"), "Descripcion", "Descripcion");
+                ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"), "Nombre", "Nombre");
+                return View(examen);
             }
+
+
             return RedirectToAction("GetExamenes");
         }
 
@@ -94,6 +106,8 @@ namespace Front.Controllers
                 _logger.LogError("Error al eliminar examen");
                 return View("Error");
             }
+            TempData["Success"] = "Examen borrado correctamente.";
+
             return RedirectToAction("GetExamenes");
         }
     }

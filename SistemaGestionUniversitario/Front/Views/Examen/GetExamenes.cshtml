@@ -31,7 +31,7 @@
     </div>
 
 
-    <!-- tabla de usuarios-->
+    <!-- tabla de examenes-->
     <table class="tablas" id="tablaExamenes">
         <thead>
             <tr>
@@ -42,7 +42,12 @@
                     @Html.DisplayNameFor(model => model.NombreMateria)
                 </th>
                 <th>
+
+                    @Html.DisplayNameFor(model => model.Fecha)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.DescripcionDiaHorario)
+
                 </th>
                 <th>
                     Eliminar
@@ -50,29 +55,41 @@
             </tr>
         </thead>
         <tbody>
+        <tbody>
             @foreach (var examen in Model)
             {
                 <tr>
                     <td>@examen.Tipo</td>
                     <td>@examen.NombreMateria</td>
-                    <td>@examen.DescripcionDiaHorario</td>
-                    <td class=" acciones eliminar d-flex justify-content-center align-items-center">
-                        <!-- Botón borrar -->
+                    <td>@examen.Fecha.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @{
+                            var horas = examen.DescripcionDiaHorario.Split(' ').Skip(1); // ignora el primer elemento (día)
+                            var horarioSolo = string.Join(" ", horas);
+                        }
+                        @horarioSolo
+                    </td>
+                    <td class="acciones eliminar d-flex justify-content-center align-items-center">
                         <button type="button"
                                 class="btn btn-sm btn-danger"
                                 data-bs-toggle="modal"
                                 data-bs-target="#confirmDeleteModal"
                                 data-tipoExamen="@examen.Tipo"
                                 data-nombreMateria="@examen.NombreMateria"
-                                data-descripcionDiaHorario="@examen.DescripcionDiaHorario">
+                                data-descripcionDiaHorario="@horarioSolo"
+                                data-fecha="@examen.Fecha.ToString("dd/MM/yyyy")">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
                 </tr>
             }
         </tbody>
+
+        </tbody>
     </table>
 </div>
+
+
 <!-- ELIMINAR -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
     <div class="modal-dialog">

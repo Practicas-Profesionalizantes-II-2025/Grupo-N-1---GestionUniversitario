@@ -86,7 +86,10 @@ namespace Logica.Implementations
                 return null;
             }
 
-            return (await _diaHorarioRepository.FindByConditionAsync(dh => dh.IdDia == dia.ID && dh.IdHorario == horario.ID)).FirstOrDefault();
+            int idDia = dia.ID;
+            int idHorario = horario.ID;
+
+            return await _diaHorarioRepository.FindByConditionAsync(dh => dh.IdDia == idDia && dh.IdHorario == idHorario).ContinueWith(t => t.Result.FirstOrDefault());
         }
         public async Task<String> ObtenerDescripcionDiaHorarioPorIDsUsoInterno(int idDia, int idHorario)
         {

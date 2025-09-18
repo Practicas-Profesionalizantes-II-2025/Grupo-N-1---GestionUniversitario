@@ -1,16 +1,39 @@
-﻿//////////////////////
-//     ELIMINAR
-/////////////////////
-document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", function () {
+    /////////////////////////
+    // aceptar deshabilitado
+    /////////////////////////
+    const form = document.getElementById('examenForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function checkForm() {
+        const requiredFields = form.querySelectorAll('.required-field');
+        let allFilled = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value) {
+                allFilled = false;
+            }
+        });
+
+        submitBtn.disabled = !allFilled;
+    }
+
+    // Ejecutamos al cambiar cualquier campo
+    form.addEventListener('input', checkForm);
+
+    ///////////////////////
+    //     ELIMINAR
+    ///////////////////////
     const confirmModal = document.getElementById('confirmDeleteModal');
     const confirmCheckbox = document.getElementById('confirmCheckbox');
     const btnAceptar = document.getElementById('btnAceptar');
     const deleteForm = document.getElementById('deleteForm');
     const deleteMessage = document.getElementById('deleteMessage');
 
-    if (confirmModal) { // por seguridad
+    if (confirmModal) {
         confirmModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
+            const id = button.getAttribute('data-idExamen');
             const tipo = button.getAttribute('data-tipoExamen');
             const materia = button.getAttribute('data-nombreMateria');
             const descripcion = button.getAttribute('data-descripcionDiaHorario');
@@ -18,8 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
             deleteMessage.textContent =
                 `¿Desea eliminar el examen ${tipo} de la fecha ${descripcion} de la materia ${materia}?`;
 
-            // Codificar parámetros
-            const url = `/Examen/DeleteExamen?nombreMateria=${encodeURIComponent(materia)}&descripcionDiaHorario=${encodeURIComponent(descripcion)}`;
+            const url = `/Examen/DeleteExamen/${id}`;
             deleteForm.setAttribute('action', url);
 
             confirmCheckbox.checked = false;
@@ -32,8 +54,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     ///////////////////////
-    //       FILTRO     //
-    /////////////////////
+    //       FILTRO
+    ///////////////////////
     const searchBox = document.getElementById("searchBox");
     const chkParcial = document.getElementById("chkParcial");
     const chkFinal = document.getElementById("chkFinal");
@@ -62,4 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
     searchBox.addEventListener("input", aplicarFiltros);
     chkParcial.addEventListener("change", aplicarFiltros);
     chkFinal.addEventListener("change", aplicarFiltros);
+
+    // Llamamos checkForm al cargar para asegurarnos que el botón inicie deshabilitado
+    checkForm();
 });
