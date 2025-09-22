@@ -64,19 +64,32 @@
                     <td>@examen.Fecha.ToString("dd/MM/yyyy")</td>
                     <td>
                         @{
-                            var horas = examen.DescripcionDiaHorario.Split(' ').Skip(1); // ignora el primer elemento (día)
-                            var horarioSolo = string.Join(" ", horas);
+                            var partes = examen.DescripcionDiaHorario.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            // índice 0 = día, índice 1 = primera hora
+                            var primeraHora = partes.Length > 1 ? partes[1] : string.Empty;
                         }
-                        @horarioSolo
+                        @primeraHora
                     </td>
                     <td class="acciones eliminar d-flex justify-content-center align-items-center">
+                        <!-- Botón informacion -->
+                        <button type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#informacionExamen"
+                                data-id="@examen.ID"
+                                data-tipo="@examen.Tipo"
+                                data-materia="@examen.NombreMateria"
+                                data-horario="@examen.DescripcionDiaHorario"
+                                data-fecha="@examen.Fecha.ToString("yyyy-MM-dd")">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                        <!-- Botón eliminar -->
                         <button type="button"
                                 class="btn btn-sm btn-danger"
                                 data-bs-toggle="modal"
                                 data-bs-target="#confirmDeleteModal"
                                 data-tipoExamen="@examen.Tipo"
                                 data-nombreMateria="@examen.NombreMateria"
-                                data-descripcionDiaHorario="@horarioSolo"
+                                data-descripcionDiaHorario="@primeraHora"
                                 data-fecha="@examen.Fecha.ToString("dd/MM/yyyy")">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -117,4 +130,47 @@
         </div>
     </div>
 </div>
-<script src="~/js/examenes.js"></script>
+<!-- INFORMACION EXAMEN -->
+<div class="modal fade" id="informacionExamen" tabindex="-1" aria-labelledby="infoExamenLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="infoExamenForm" method="post" asp-action="UpdateExamen" asp-controller="Examen">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoExamenLabel">Información del Examen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <label for="infoTipo" class="form-label">Tipo:</label>
+                        <input type="text" id="infoTipo" name="Tipo" class="form-control" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="infoMateria" class="form-label">Materia:</label>
+                        <input type="text" id="infoMateria" name="Materia" class="form-control" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="infoHorario" class="form-label">Horario:</label>
+                        <input type="text" id="infoHorario" name="Horario" class="form-control" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="infoFecha" class="form-label">Fecha:</label>
+                        <input type="date" id="infoFecha" name="Fecha" class="form-control" />
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+                    <button type="button" id="btnModificarExamen" class="btn btn-secondary">Modificar</button>
+                    <button type="submit" id="btnConfirmarExamen" class="btn btn-primary">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/examenes.js?v=@DateTime.Now.Ticks"></script>

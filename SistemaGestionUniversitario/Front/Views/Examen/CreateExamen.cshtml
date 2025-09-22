@@ -29,14 +29,18 @@
 
             <div class="mb-3">
                 <label asp-for="DescripcionDiaHorario" class="form-label">Horario *</label>
-                <select asp-for="DescripcionDiaHorario" asp-items="ViewBag.Horario" class="form-select required-field">
-                    <option value="">Seleccione...</option>
+                <select asp-for="DescripcionDiaHorario"
+                        asp-items="ViewBag.Horario"
+                        class="form-select required-field"
+                        multiple="multiple" size="5">
+                    @* No uses la opción “Seleccione…” en multiselección, suele ser confuso *@
                     @foreach (var horario in ViewBag.Horario as SelectList)
                     {
                         <option value="@horario.Value">@horario.Text</option>
                     }
                 </select>
             </div>
+
 
             <div class="mb-3">
                 <label asp-for="Fecha" class="form-label">Fecha *</label>
