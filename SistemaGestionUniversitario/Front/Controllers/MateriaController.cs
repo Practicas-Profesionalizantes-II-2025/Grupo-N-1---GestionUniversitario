@@ -54,7 +54,7 @@ namespace Front.Controllers
         {
             try
             {
-                MateriaFront? materia = await _httpClient.GetFromJsonAsync<MateriaFront>($"Materia/{nombreMateria}");
+                MateriaFront? materia = await _httpClient.GetFromJsonAsync<MateriaFront>($"Materia/NombreMateria/{nombreMateria}");
                 if (materia == null)
                     return NotFound(new { message = "Materia inexistente o no encontrada." });
 
