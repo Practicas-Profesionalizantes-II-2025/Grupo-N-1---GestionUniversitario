@@ -39,16 +39,26 @@
                 </div>
 
                 <!-- CAMBIO PASSWORD -->
-                <form asp-action="UpdatePasswordUsuario" method="post"> 
+                <form asp-action="UpdatePasswordUsuario" method="post">
 
                     <div class="mb-3">
                         <label class="form-label">Cambio Contraseña</label>
                         <div class="row">
                             <div class="col-md-6">
-                                <input type="password" name="ActualPassword" class="form-control" placeholder="Contraseña Actual" />
+                                <div class="input-group">
+                                    <input type="password" name="ActualPassword" id="actualPassword" class="form-control" placeholder="Contraseña Actual" />
+                                    <button type="button" class="btn btn-outline-secondary" tabindex="-1" id="toggleActualPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="col-md-6">
-                                <input type="password" name="NuevaPassword" class="form-control" placeholder="Nueva Contraseña" />
+                                <div class="input-group">
+                                    <input type="password" name="NuevaPassword" id="nuevaPassword" class="form-control" placeholder="Nueva Contraseña" />
+                                    <button type="button" class="btn btn-outline-secondary" tabindex="-1" id="toggleNuevaPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -63,8 +73,29 @@
                     }
 
                 </form>
-                
             </div>
         </div>
     </div>
 <div/>
+
+<script>
+    function togglePassword(buttonId, inputId) {
+        const btn = document.getElementById(buttonId);
+        const input = document.getElementById(inputId);
+        btn.addEventListener("click", () => {
+            const icon = btn.querySelector("i");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
+        });
+    }
+
+    togglePassword("toggleActualPassword", "actualPassword");
+    togglePassword("toggleNuevaPassword", "nuevaPassword");
+</script>
