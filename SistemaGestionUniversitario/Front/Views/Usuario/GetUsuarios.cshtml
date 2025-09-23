@@ -104,7 +104,7 @@
 
 <!-- ELIMINAR -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="confirmDeleteLabel">Eliminar Usuario</h5>
@@ -122,7 +122,7 @@
             <div class="modal-footer">
                 <form id="deleteForm" method="post" style="display:inline;">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger" id="btnAceptar" disabled>Aceptar</button>
+                    <button type="submit" class="btn btn-danger" id="btnAceptar" disabled>Eliminar</button>
                 </form>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             </div>
