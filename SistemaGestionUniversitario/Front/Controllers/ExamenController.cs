@@ -30,6 +30,12 @@ namespace Front.Controllers
         [HttpGet]
         public async Task<IActionResult> GetExamenes()
         {
+            List<HorarioFront>? horario = await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario");
+            ViewBag.Horarios = new SelectList(horario, "Descripcion", "Descripcion");
+
+            List<MateriaFront>? materia = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia");
+            ViewBag.Materias = new SelectList(materia, "Nombre", "Nombre");
+
             try
             {
                 List<ExamenFront>? examenes = await _httpClient.GetFromJsonAsync<List<ExamenFront>>("Examen");
@@ -55,35 +61,70 @@ namespace Front.Controllers
 
             return View();
         }
-
-        // POST: /Examen/CreateExamen
         [Authorize(Roles = "Profesor")]
         [HttpPost]
         public async Task<IActionResult> CreateExamen(CrearExamenFront examen, string DescripcionDiaHorario)
         {
-
-            // Obtener el día de la semana como texto (Lunes, Martes, etc.)
-            string diaSemana = examen.Fecha.ToString("dddd", new System.Globalization.CultureInfo("es-ES"));
-
-            // Combinar con el horario seleccionado
-            examen.DescripcionDiaHorario = $"{examen.Fecha.ToString("dddd", new CultureInfo("es-ES"))} {DescripcionDiaHorario}";
-
-            var response = await _httpClient.PostAsJsonAsync("Examen", examen);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                // Recargar ViewBag para volver a mostrar el formulario
-                ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"), "Descripcion", "Descripcion");
+                // 🔹 Lista para acumular errores
+                var errores = new List<string>();
+
+                if (string.IsNullOrWhiteSpace(examen.Tipo))
+                    errores.Add("Tipo");
+                if (string.IsNullOrWhiteSpace(examen.NombreMateria))
+                    errores.Add("Materia");
+                if (string.IsNullOrWhiteSpace(DescripcionDiaHorario))
+                    errores.Add("Horario");
+                if (examen.Fecha == default)
+                    errores.Add("Fecha");
+
+                if (errores.Any())
+                {
+                    string campos = string.Join(", ", errores);
+                    ModelState.AddModelError(string.Empty, $"Los campos {campos} son obligatorios.");
+
+                    // 🔹 Recargar selects
+                    ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"), "ID", "Descripcion");
+                    ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"), "Nombre", "Nombre");
+
+                    return View(examen);
+                }
+
+                // Combinar día de la semana con el horario seleccionado
+                examen.DescripcionDiaHorario = $"{examen.Fecha.ToString("dddd", new CultureInfo("es-ES"))} {DescripcionDiaHorario}";
+
+                HttpResponseMessage response = await _httpClient.PostAsJsonAsync("Examen", examen);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError(string.Empty, "Error al crear examen: " + errorContent);
+
+                    ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"), "ID", "Descripcion");
+                    ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"), "Nombre", "Nombre");
+
+                    return View(examen);
+                }
+
+                TempData["Success"] = "Examen creado correctamente.";
+                return RedirectToAction("GetExamenes");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear examen");
+
+                ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"), "ID", "Descripcion");
                 ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"), "Nombre", "Nombre");
+
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(examen);
             }
-
-
-            return RedirectToAction("GetExamenes");
         }
 
-        // PUT: /Examen/UpdateExamen/{id}
+        // POST: /Examen/UpdateExamen/{id}
         [Authorize(Roles = "Profesor")]
-        [HttpPut]
+        [HttpPost]
         public async Task<IActionResult> UpdateExamen(int id, ModificarExamenFront examen)
         {
             var response = await _httpClient.PutAsJsonAsync($"Examen/{id}", examen);

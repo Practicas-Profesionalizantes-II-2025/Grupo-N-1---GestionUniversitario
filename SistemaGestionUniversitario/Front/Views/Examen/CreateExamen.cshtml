@@ -4,7 +4,7 @@
     ViewData["Title"] = "CreteExamen";
 }
 
-<div class="d-flex justify-content-center align-items-center vh-100">
+<div class="d-flex justify-content-center">
     <div class="col-md-6">
         <h2 class="text-center py-2 bg-secondary text-white rounded">Nuevo Examen</h2>
 
@@ -29,27 +29,20 @@
 
             <div class="mb-3">
                 <label asp-for="DescripcionDiaHorario" class="form-label">Horario *</label>
-                <select asp-for="DescripcionDiaHorario"
-                        asp-items="ViewBag.Horario"
-                        class="form-select required-field"
-                        multiple="multiple" size="5">
-                    @* No uses la opción “Seleccione…” en multiselección, suele ser confuso *@
-                    @foreach (var horario in ViewBag.Horario as SelectList)
-                    {
-                        <option value="@horario.Value">@horario.Text</option>
-                    }
+                <select asp-for="DescripcionDiaHorario" asp-items="ViewBag.Horario" class="form-select required-field">
+                    <option value="">Seleccione...</option>
                 </select>
             </div>
 
 
-            <div class="mb-3">
+            <div class="mb-3">                    
                 <label asp-for="Fecha" class="form-label">Fecha *</label>
                 <input asp-for="Fecha" class="form-control" type="date" />
             </div>
 
             <!-- Botones centrados -->
             <div class="d-flex justify-content-center mt-3">
-                <input id="submitBtn" type="submit" value="Aceptar" class="btn btn-secondary me-2" disabled />
+                <input id="submitBtn" type="submit" value="Aceptar" class="btn btn-secondary me-2"  />
                 <a asp-action="GetExamenes" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>

@@ -73,6 +73,7 @@
                     <td class="acciones eliminar d-flex justify-content-center align-items-center">
                         <!-- Botón informacion -->
                         <button type="button"
+                                class="btn btn-sm btn-info"
                                 data-bs-toggle="modal"
                                 data-bs-target="#informacionExamen"
                                 data-id="@examen.ID"
@@ -130,47 +131,62 @@
         </div>
     </div>
 </div>
-<!-- INFORMACION EXAMEN -->
+
+<!-- INFORMACIÓN EXAMEN -->
 <div class="modal fade" id="informacionExamen" tabindex="-1" aria-labelledby="infoExamenLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="infoExamenForm" method="post" asp-action="UpdateExamen" asp-controller="Examen">
+            <form id="infoExamenForm" asp-action="UpdateExamen" asp-controller="Examen" method="post">
                 @Html.AntiForgeryToken()
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="infoExamenLabel">Información del Examen</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body">
-                    <div class="mb-2">
-                        <label for="infoTipo" class="form-label">Tipo:</label>
-                        <input type="text" id="infoTipo" name="Tipo" class="form-control" />
+                    <!-- Tipo -->
+                    <div class="mb-3">
+                        <label name="Tipo" class="form-label">Tipo *</label>
+                        <select name="Tipo" id="infoTipo" class="form-select" disabled>
+                            <option value="">Seleccione...</option>
+                            <option value="Final">Final</option>
+                            <option value="Parcial">Parcial</option>
+                        </select>
                     </div>
 
-                    <div class="mb-2">
-                        <label for="infoMateria" class="form-label">Materia:</label>
-                        <input type="text" id="infoMateria" name="Materia" class="form-control" />
+                    <!-- Materia -->
+                    <div class="mb-3">
+                        <label name="NombreMateria"  class="form-label">Materia *</label>
+                        <select name="NombreMateria" id="infoMateria" asp-items="ViewBag.Materias" class="form-select" disabled>
+                            <option value="">Seleccione...</option>
+                        </select>
                     </div>
 
-                    <div class="mb-2">
-                        <label for="infoHorario" class="form-label">Horario:</label>
-                        <input type="text" id="infoHorario" name="Horario" class="form-control" />
+                    <!-- Horario -->
+                    <div class="mb-3">
+                        <label name="DescripcionHorario" class="form-label">Horario *</label>
+                        <select name="DescripcionHorario" id="infoHorario" asp-items="ViewBag.Horarios" class="form-select" disabled>
+                            <option value="">Seleccione...</option>
+                        </select>
                     </div>
 
-                    <div class="mb-2">
-                        <label for="infoFecha" class="form-label">Fecha:</label>
-                        <input type="date" id="infoFecha" name="Fecha" class="form-control" />
+                    <!-- Fecha -->
+                    <div class="mb-3">
+                        <label name="Fecha"class="form-label">Fecha *</label>
+                        <input name="Fecha" id="infoFecha" type="date" class="form-control" disabled />
                     </div>
                 </div>
 
-
                 <div class="modal-footer">
                     <button type="button" id="btnModificarExamen" class="btn btn-secondary">Modificar</button>
-                    <button type="submit" id="btnConfirmarExamen" class="btn btn-primary">Confirmar</button>
+                    <button type="submit" class="btn btn-primary" id=btnConfirmarExamen disabled>Confirmar </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+
 
 <script src="~/js/examenes.js?v=@DateTime.Now.Ticks"></script>
