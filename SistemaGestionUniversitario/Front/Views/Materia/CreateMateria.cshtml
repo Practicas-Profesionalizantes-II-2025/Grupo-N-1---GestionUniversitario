@@ -63,7 +63,7 @@
                         <div class="selected-items" id="selectedProfessors"></div>
 
                         <!-- Campo oculto para almacenar los IDs seleccionados -->
-                        <input type="hidden" id="ProfesoresIDs" name="ProfesoresIDs" asp-for="ProfesoresIDs">
+                        <div id="hiddenProfesoresInputs"></div>
                     </div>
 
                     <!-- Selector de Días y Horarios -->
@@ -86,7 +86,7 @@
                         <div class="selected-items" id="selectedHorarios"></div>
 
                         <!-- Campo oculto para almacenar los IDs seleccionados -->
-                        <input type="hidden" id="DiasHorariosIDs" name="DiasHorariosIDs" asp-for="DiasHorariosIDs">
+                        <div id="hiddenHorariosInputs"></div>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Aceptar</button>
@@ -138,13 +138,11 @@
         // Función para actualizar la visualización de profesores seleccionados
         function updateSelectedProfessors() {
             const container = document.getElementById('selectedProfessors');
-            const hiddenInput = document.getElementById('ProfesoresIDs');
+            const hiddenInputsContainer = document.getElementById('hiddenProfesoresInputs');
 
             // Limpiar el contenedor
             container.innerHTML = '';
-
-            // Actualizar el campo oculto con los IDs
-            hiddenInput.value = selectedProfessors.map(prof => prof.id).join(',');
+            hiddenInputsContainer.innerHTML = '';
 
             // Añadir cada profesor seleccionado
             selectedProfessors.forEach(prof => {
@@ -152,6 +150,13 @@
                 badge.className = 'selected-item';
                 badge.innerHTML = `${prof.nombre} <span class="remove-btn" onclick="removeProfessor(${prof.id})">×</span>`;
                 container.appendChild(badge);
+
+                // Crear un input oculto por cada ID
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ProfesoresIDs';
+                input.value = prof.id;
+                hiddenInputsContainer.appendChild(input);
             });
         }
 
@@ -184,13 +189,11 @@
         // Función para actualizar la visualización de horarios seleccionados
         function updateSelectedHorarios() {
             const container = document.getElementById('selectedHorarios');
-            const hiddenInput = document.getElementById('DiasHorariosIDs');
+            const hiddenInputsContainer = document.getElementById('hiddenHorariosInputs');
 
             // Limpiar el contenedor
             container.innerHTML = '';
-
-            // Actualizar el campo oculto con los IDs
-            hiddenInput.value = selectedHorarios.map(horario => horario.id).join(',');
+            hiddenInputsContainer.innerHTML = '';
 
             // Añadir cada horario seleccionado
             selectedHorarios.forEach(horario => {
@@ -198,6 +201,13 @@
                 badge.className = 'selected-item';
                 badge.innerHTML = `${horario.descripcion} <span class="remove-btn" onclick="removeHorario(${horario.id})">×</span>`;
                 container.appendChild(badge);
+
+                // Crear un input oculto por cada ID
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'DiasHorariosIDs';
+                input.value = horario.id;
+                hiddenInputsContainer.appendChild(input);
             });
         }
 

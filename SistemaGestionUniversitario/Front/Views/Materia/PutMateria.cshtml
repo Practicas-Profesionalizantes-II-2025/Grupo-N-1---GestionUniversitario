@@ -48,6 +48,7 @@
                             <option value="@prof.ID">@prof.NombreCompleto</option>
                         }
                     </select>
+                    <span asp-validation-for="ProfesoresIDs" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
@@ -58,6 +59,7 @@
                             <option value="@hor.ID">@hor.DescripcionDia - @hor.DescripcionHorario</option>
                         }
                     </select>
+                    <span asp-validation-for="DiasHorariosIDs" class="text-danger"></span>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Guardar</button>

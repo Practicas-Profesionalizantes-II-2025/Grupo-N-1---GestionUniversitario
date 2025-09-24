@@ -15,7 +15,9 @@ namespace Front.Models.Crear
         public string Modalidad { get; set; }
 
         // IDs seleccionados en el form
+        [Required(ErrorMessage = "El campo profesor es obligatorio")]
         public List<int> ProfesoresIDs { get; set; } = new();
+        [Required(ErrorMessage = "El campo Días y Horarios es obligatorio")]
         public List<int> DiasHorariosIDs { get; set; } = new();
 
         // Listas para poblar dropdowns
