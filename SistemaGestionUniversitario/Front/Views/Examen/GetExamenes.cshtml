@@ -88,9 +88,10 @@
                                 class="btn btn-sm btn-danger"
                                 data-bs-toggle="modal"
                                 data-bs-target="#confirmDeleteModal"
+                                data-id="@examen.ID"
                                 data-tipoExamen="@examen.Tipo"
                                 data-nombreMateria="@examen.NombreMateria"
-                                data-descripcionDiaHorario="@primeraHora"
+                                data-descripcionDiaHorario="@examen.DescripcionDiaHorario"
                                 data-fecha="@examen.Fecha.ToString("dd/MM/yyyy")">
                             <i class="bi bi-trash"></i>
                         </button>

@@ -42,3 +42,42 @@ if (btnModificar) {
     });
 }
 });
+// =======================
+
+// MODAL ELIMINAR EXAMEN
+
+// =======================
+
+const confirmModal = document.getElementById('confirmDeleteModal');
+const confirmCheckbox = document.getElementById('confirmCheckbox');
+const btnAceptar = document.getElementById('btnAceptar');
+const deleteForm = document.getElementById('deleteForm');
+const deleteMessage = document.getElementById('deleteMessage');
+
+// Configurar modal al abrirse
+confirmModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget; // Botón que abrió el modal
+    const id = button.getAttribute('data-id');
+    const nombreMateria = button.getAttribute('data-nombreMateria');
+    const tipo = button.getAttribute('data-tipoExamen');
+    const descripcion = button.getAttribute('data-descripcionDiaHorario');
+    const fecha = button.getAttribute('data-fecha');
+
+    deleteForm.setAttribute('action', `/Examen/DeleteExamen?nombreMateria=${nombreMateria}&descripcionDiaHorario=${descripcion}&fecha=${fecha}`);
+
+    // Mensaje personalizado
+    deleteMessage.textContent = `¿Desea eliminar el examen ${tipo} de ${nombreMateria}?`;
+    // Resetear checkbox y botón
+    confirmCheckbox.checked = false;
+    btnAceptar.disabled = true;
+});
+
+// Habilitar aceptar solo si checkbox está marcado
+confirmCheckbox.addEventListener('change', function () {
+    btnAceptar.disabled = !this.checked;
+});
+
+// ==========================
+//    FILTRO Y BUSCADOR
+//==============================
+//

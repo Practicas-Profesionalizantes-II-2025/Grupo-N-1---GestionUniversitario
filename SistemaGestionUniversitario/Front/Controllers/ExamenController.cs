@@ -55,7 +55,7 @@ namespace Front.Controllers
         {
             List<HorarioFront>? horario = await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario");
             ViewBag.Horario = new SelectList(horario, "Descripcion", "Descripcion");
-            
+
             List<MateriaFront>? materia = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia");
             ViewBag.Materias = new SelectList(materia, "Nombre", "Nombre");
 
@@ -125,31 +125,38 @@ namespace Front.Controllers
         // POST: /Examen/UpdateExamen/{id}
         [Authorize(Roles = "Profesor")]
         [HttpPost]
-        public async Task<IActionResult> UpdateExamen(int id, ModificarExamenFront examen)
+        public async Task<IActionResult> DeleteExamen(string nombreMateria, string descripcionDiaHorario, DateTime fecha)
         {
-            var response = await _httpClient.PutAsJsonAsync($"Examen/{id}", examen);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogError("Error al actualizar examen");
-                return View("Error");
+                string fechaStr = fecha.ToString("yyyy-MM-dd");
+
+                HttpResponseMessage response = await _httpClient.DeleteAsync(
+                    $"Examen/{nombreMateria}/{descripcionDiaHorario}?fecha={fechaStr}"
+                );
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                        TempData["Error"] = "No se encontró el examen a eliminar.";
+                    else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                        TempData["Error"] = "Error al eliminar examen.";
+                    else
+                        TempData["Error"] = "Ocurrió un error inesperado al eliminar el examen.";
+
+                    return RedirectToAction("GetExamenes");
+                }
+
+                TempData["Success"] = "Examen eliminado correctamente.";
+                return RedirectToAction("GetExamenes");
             }
-            return RedirectToAction("GetExamenes");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar examen");
+                TempData["Error"] = "Ocurrió un error al eliminar el examen.";
+                return RedirectToAction("GetExamenes");
+            }
         }
 
-        // DELETE: /Examen/DeleteExamen/{id}
-        [Authorize(Roles = "Profesor")]
-        [HttpDelete]
-        public async Task<IActionResult> DeleteExamen(int id)
-        {
-            var response = await _httpClient.DeleteAsync($"Examen/{id}");
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError("Error al eliminar examen");
-                return View("Error");
-            }
-            TempData["Success"] = "Examen borrado correctamente.";
-
-            return RedirectToAction("GetExamenes");
-        }
     }
 }
