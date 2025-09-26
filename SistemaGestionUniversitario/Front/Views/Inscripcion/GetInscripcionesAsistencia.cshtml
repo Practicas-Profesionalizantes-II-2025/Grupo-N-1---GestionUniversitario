@@ -2,7 +2,25 @@
 
 @{
     ViewData["Title"] = "GetInscripcionesAsistencia";
-    List<Front.Models.Respuestas.MateriaFront>? materias = ViewBag.Materias as List<Front.Models.Respuestas.MateriaFront>;
+
+    // Convertimos ViewBag a tipo fuerte
+    List<Front.Models.Respuestas.MateriaFront> materias = ViewBag.Materias as List<Front.Models.Respuestas.MateriaFront>;
+
+    // Buscamos la materia seleccionada de forma segura
+    Front.Models.Respuestas.MateriaFront materiaSeleccionada = null;
+    if (materias != null && ViewBag.SelectedMateria != null)
+    {
+        materiaSeleccionada = materias.FirstOrDefault(m => m.Nombre == (string)ViewBag.SelectedMateria);
+    }
+
+    // Extraemos solo los días (la primera palabra de cada string)
+    List<string> diasMateria = new List<string>();
+    if (materiaSeleccionada != null && materiaSeleccionada.DescripcionDiasHorarios != null)
+    {
+        diasMateria = materiaSeleccionada.DescripcionDiasHorarios
+                                    .Select(d => d.Split(' ')[0])
+                                    .ToList();
+    }
 }
 
 <div class="container">
@@ -11,9 +29,12 @@
     <div class="d-flex align-items-center mb-3">
         <!-- Fecha -->
         <div class="me-3">
-            <input type="date" class="form-control" id="fechaAsistencia">
+            <input type="date"
+                   class="form-control"
+                   id="fechaAsistencia"
+                   value="@DateTime.Today.ToString("yyyy-MM-dd")" />
         </div>
-
+        
         <!-- lista materias-->
         <form asp-action="GetInscripcionesAsistencia" method="get">
             <select name="nombreMateria" id="materia" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
@@ -97,3 +118,34 @@
 </form>
 
 <script src="~/js/asistencias.js"></script>
+
+<script>
+    // Pasamos los días permitidos desde Razor a JS
+    const diasPermitidos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(diasMateria));
+
+    const fechaInput = document.getElementById("fechaAsistencia");
+
+    // Función para validar si la fecha corresponde a un día permitido
+    function esDiaPermitido(fecha) {
+        const diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+        const diaNombre = diasSemana[fecha.getDay()];
+        return diasPermitidos.includes(diaNombre);
+    }
+
+    // Validar al cambiar la fecha
+    fechaInput.addEventListener("input", function() {
+        const fechaSeleccionada = new Date(this.value);
+        if (!esDiaPermitido(fechaSeleccionada)) {
+            alert("La fecha seleccionada no corresponde a un día en que se dicta esta materia.");
+            this.value = ""; // limpiar input
+        }
+    });
+
+    // Inicializamos con hoy si es día válido
+    const hoy = new Date();
+    if (esDiaPermitido(hoy)) {
+        fechaInput.valueAsDate = hoy;
+    } else {
+        fechaInput.value = "";
+    }
+</script>
