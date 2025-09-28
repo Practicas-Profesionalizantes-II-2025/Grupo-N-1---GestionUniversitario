@@ -80,40 +80,38 @@ confirmCheckbox.addEventListener('change', function () {
 
 // ==========================
 //    FILTRO Y BUSCADOR DE EXÁMENES
-//==============================
-//document.addEventListener("DOMContentLoaded", function () {
-//    const searchBox = document.getElementById("searchBox");
-//    const filtroTipo = document.getElementById("filtroTipo");
-//    const tbody = document.querySelector("#tablaExamenes tbody");
+//================================
+document.addEventListener("DOMContentLoaded", () => {
+    const searchBox = document.getElementById("searchBox");
+    const chkFinal = document.getElementById("chkFinal");
+    const chkParcial = document.getElementById("chkParcial");
+    const tabla = document.getElementById("tablaExamenes");
 
-//    const filasOriginales = Array.from(tbody.querySelectorAll("tr"));
+    if (!tabla) return;
 
-//    function aplicarFiltros() {
-//        const texto = searchBox.value.toLowerCase().trim();
-//        const tipo = filtroTipo.value.toLowerCase().trim();
+    const filasOriginales = Array.from(tabla.querySelectorAll("tbody tr"));
 
-//        const filasFiltradas = filasOriginales.filter(fila => {
-//            const columnas = fila.querySelectorAll("td");
-//            const tipoExamen = (columnas[0]?.textContent || "").toLowerCase().trim();
-//            const nombreMateria = (columnas[1]?.textContent || "").toLowerCase().trim();
-//            const fecha = (columnas[2]?.textContent || "").toLowerCase().trim();
-//            const horario = (columnas[3]?.textContent || "").toLowerCase().trim();
+    function aplicarFiltros() {
+        const textoBusqueda = searchBox.value.toLowerCase();
+        const tiposSeleccionados = [];
+        if (chkFinal.checked) tiposSeleccionados.push("Final");
+        if (chkParcial.checked) tiposSeleccionados.push("Parcial");
 
-//            const cumpleBusqueda =
-//                tipoExamen.includes(texto) ||
-//                nombreMateria.includes(texto) ||
-//                fecha.includes(texto) ||
-//                horario.includes(texto);
+        filasOriginales.forEach(fila => {
+            const celdas = fila.querySelectorAll("td");
+            const textoFila = Array.from(celdas).map(td => td.textContent.toLowerCase()).join(" ");
+            // Índice 0 = columna Tipo
+            const tipoExamen = celdas[0]?.textContent || "";
 
-//            const cumpleTipo = tipo === "" || tipoExamen === tipo;
+            const coincideBusqueda = textoFila.includes(textoBusqueda);
+            const coincideTipo = tiposSeleccionados.length === 0 || tiposSeleccionados.includes(tipoExamen);
 
-//            return cumpleBusqueda && cumpleTipo;
-//        });
+            fila.style.display = coincideBusqueda && coincideTipo ? "" : "none";
+        });
+    }
 
-//        tbody.innerHTML = "";
-//        filasFiltradas.forEach(f => tbody.appendChild(f));
-//    }
-
-//    searchBox.addEventListener("input", aplicarFiltros);
-//    filtroTipo.addEventListener("change", aplicarFiltros);
-//});
+    // Eventos
+    searchBox.addEventListener("input", aplicarFiltros);
+    chkFinal.addEventListener("change", aplicarFiltros);
+    chkParcial.addEventListener("change", aplicarFiltros);
+});

@@ -10,9 +10,19 @@
         <div class="d-flex align-items-center">
             <input type="text" id="searchBox" class="form-control me-2" placeholder="Buscar..." style="width: 250px; height: 48px;">
             <div class="dropdown me-2">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="btnFiltro" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="btnFiltroExamen" data-bs-toggle="dropdown" aria-expanded="false" style="height:32px; padding:2px 10px;">
                     <i class="bi bi-funnel"></i> Filtro
                 </button>
+                <ul class="dropdown-menu p-3" aria-labelledby="btnFiltroExamen" style="min-width: 150px;">
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Final" id="chkFinal">
+                        <label class="form-check-label" for="chkFinal">Final</label>
+                    </li>
+                    <li class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Parcial" id="chkParcial">
+                        <label class="form-check-label" for="chkParcial">Parcial</label>
+                    </li>
+                </ul>
             </div>
         </div>
         <div>
