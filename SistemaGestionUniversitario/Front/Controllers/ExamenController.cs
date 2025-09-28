@@ -157,6 +157,68 @@ namespace Front.Controllers
                 return RedirectToAction("GetExamenes");
             }
         }
+        [Authorize(Roles = "Profesor")]
+        [HttpPost]
+        public async Task<IActionResult> UpdateExamen(ModificarExamenFront examen)
+        {
+            try
+            {
+                var errores = new List<string>();
 
+                if (string.IsNullOrWhiteSpace(examen.Tipo)) errores.Add("Tipo");
+                if (string.IsNullOrWhiteSpace(examen.NombreMateria)) errores.Add("Materia");
+                if (string.IsNullOrWhiteSpace(examen.DescripcionDiaHorario)) errores.Add("Nuevo Horario");
+                if (examen.Fecha == default) errores.Add("Fecha");
+
+                if (errores.Any())
+                {
+                    ModelState.AddModelError(string.Empty,
+                        $"Los campos {string.Join(", ", errores)} son obligatorios.");
+
+                    ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"),
+                                                     "Descripcion", "Descripcion");
+                    ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"),
+                                                      "Nombre", "Nombre");
+                    if (errores.Any())
+                    {
+                        TempData["Error"] = $"Los campos {string.Join(", ", errores)} son obligatorios.";
+                        return RedirectToAction("GetExamenes");
+                    }
+                }
+
+                // Combinar día con el nuevo horario
+                examen.DescripcionDiaHorario =$"{examen.Fecha.ToString("dddd", new CultureInfo("es-ES"))} {examen.DescripcionDiaHorario}";
+               
+                HttpResponseMessage response = await _httpClient.PutAsJsonAsync("Examen", examen);
+
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError(string.Empty, "Error al actualizar examen: " + errorContent);
+
+                    ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"),
+                                                     "Descripcion", "Descripcion");
+                    ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"),
+                                                      "Nombre", "Nombre");
+                    return View(examen);
+                }
+
+                TempData["Success"] = "Examen actualizado correctamente.";
+                return RedirectToAction("GetExamenes");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar examen");
+
+                ViewBag.Horario = new SelectList(await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario"),
+                                                 "Descripcion", "Descripcion");
+                ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"),
+                                                  "Nombre", "Nombre");
+
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(examen);
+            }
+        }
     }
 }

@@ -22,12 +22,13 @@ infoModal.addEventListener('show.bs.modal', event => {
     document.getElementById('infoMateria').value = materia;
     document.getElementById('infoHorario').value = horario;
     document.getElementById('infoFecha').value = fecha;
+    document.getElementById('infoID').value = id; // <-- asignación importante
 
     // Bloquear inputs inicialmente
     document.querySelectorAll('#infoExamenForm input').forEach(i => i.disabled = true);
 
     // Acción del form (si querés enviar al controlador con id)
-    document.getElementById('infoExamenForm').setAttribute('action', `/Examen/UpdateExamen/${id}`);
+    document.getElementById('infoExamenForm').setAttribute('action', `/Examen/UpdateExamen/`);
 
     // Deshabilitar botón Confirmar hasta que se presione Modificar
     document.getElementById('btnConfirmarExamen').disabled = true;
@@ -78,6 +79,41 @@ confirmCheckbox.addEventListener('change', function () {
 });
 
 // ==========================
-//    FILTRO Y BUSCADOR
+//    FILTRO Y BUSCADOR DE EXÁMENES
 //==============================
-//
+//document.addEventListener("DOMContentLoaded", function () {
+//    const searchBox = document.getElementById("searchBox");
+//    const filtroTipo = document.getElementById("filtroTipo");
+//    const tbody = document.querySelector("#tablaExamenes tbody");
+
+//    const filasOriginales = Array.from(tbody.querySelectorAll("tr"));
+
+//    function aplicarFiltros() {
+//        const texto = searchBox.value.toLowerCase().trim();
+//        const tipo = filtroTipo.value.toLowerCase().trim();
+
+//        const filasFiltradas = filasOriginales.filter(fila => {
+//            const columnas = fila.querySelectorAll("td");
+//            const tipoExamen = (columnas[0]?.textContent || "").toLowerCase().trim();
+//            const nombreMateria = (columnas[1]?.textContent || "").toLowerCase().trim();
+//            const fecha = (columnas[2]?.textContent || "").toLowerCase().trim();
+//            const horario = (columnas[3]?.textContent || "").toLowerCase().trim();
+
+//            const cumpleBusqueda =
+//                tipoExamen.includes(texto) ||
+//                nombreMateria.includes(texto) ||
+//                fecha.includes(texto) ||
+//                horario.includes(texto);
+
+//            const cumpleTipo = tipo === "" || tipoExamen === tipo;
+
+//            return cumpleBusqueda && cumpleTipo;
+//        });
+
+//        tbody.innerHTML = "";
+//        filasFiltradas.forEach(f => tbody.appendChild(f));
+//    }
+
+//    searchBox.addEventListener("input", aplicarFiltros);
+//    filtroTipo.addEventListener("change", aplicarFiltros);
+//});
