@@ -62,14 +62,7 @@
                     <td>@examen.Tipo</td>
                     <td>@examen.NombreMateria</td>
                     <td>@examen.Fecha.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        @{
-                            var partes = examen.DescripcionDiaHorario.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                            // índice 0 = día, índice 1 = primera hora
-                            var primeraHora = partes.Length > 1 ? partes[1] : string.Empty;
-                        }
-                        @primeraHora
-                    </td>
+                    <td>@examen.DescripcionDiaHorario.Split(' ')[1] @examen.DescripcionDiaHorario.Split(' ')[2] @examen.DescripcionDiaHorario.Split(' ')[3]</td>
                     <td class="acciones eliminar d-flex justify-content-center align-items-center">
                         <!-- Botón informacion -->
                         <button type="button"
