@@ -56,7 +56,7 @@ namespace Logica.Implementations
                 {
                     IdInscripcion = idinscripcion,
                     Estado = estado,
-                    Fecha = fecha,
+                    Fecha = fecha
                 };
 
                 await _asistenciaRepository.AddAsync(asistenciaNueva);

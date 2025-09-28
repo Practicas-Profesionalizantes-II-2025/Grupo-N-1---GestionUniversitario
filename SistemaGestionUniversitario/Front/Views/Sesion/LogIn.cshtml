@@ -93,9 +93,17 @@
 
             <div class="mb-3">
                 <label asp-for="Password" class="form-label text-white-50">Contraseña</label>
-                <input asp-for="Password" type="password" class="form-control bg-transparent text-white border-light" autocomplete="current-password" />
+                <div class="input-group">
+                    <input asp-for="Password" type="password" id="passwordInput"
+                           class="form-control bg-transparent text-white border-light"
+                           autocomplete="current-password" />
+                    <button type="button" class="btn btn-outline-light" id="togglePassword" tabindex="-1">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
                 <span asp-validation-for="Password" class="text-warning"></span>
             </div>
+
 
             <div asp-validation-summary="ModelOnly" class="text-warning mb-3"></div>
 
@@ -104,5 +112,18 @@
     </div>
 </div>
 
-
-
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordInput = document.getElementById("passwordInput");
+        const icon = this.querySelector("i");
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            icon.classList.remove("bi-eye-slash");
+            icon.classList.add("bi-eye");
+        }
+    });
+</script>

@@ -54,7 +54,7 @@ namespace Front.Controllers
         {
             try
             {
-                MateriaFront? materia = await _httpClient.GetFromJsonAsync<MateriaFront>($"Materia/{nombreMateria}");
+                MateriaFront? materia = await _httpClient.GetFromJsonAsync<MateriaFront>($"Materia/NombreMateria/{nombreMateria}");
                 if (materia == null)
                     return NotFound(new { message = "Materia inexistente o no encontrada." });
 
@@ -139,6 +139,7 @@ namespace Front.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateMateria(ModificarMateriaFront materia)
         {
+           
             try
             {
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{materia.MateriaSeleccionada}", materia);
@@ -158,18 +159,21 @@ namespace Front.Controllers
                     {
                         ModelState.AddModelError("", "Ocurrió un error inesperado al actualizar la materia.");
                     }
-
-                    return View(materia);
+                    materia.TodasMaterias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("Materia") ?? new();
+                    materia.Profesores = await _httpClient.GetFromJsonAsync<List<ProfesorFront>>("Profesor") ?? new();
+                    materia.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
+                    return View("PutMateria", materia);
                 }
-
+                
                 TempData["Success"] = "Materia actualizada correctamente.";
                 return RedirectToAction("GetMaterias");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al actualizar materia");
-                return View(materia);
+                return View("PutMateria", materia);
             }
+
         }
 
 

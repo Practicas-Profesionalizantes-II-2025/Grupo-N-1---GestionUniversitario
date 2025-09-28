@@ -35,18 +35,18 @@
         </div>
     </div>
     <div>
-        <a href="@Url.Action("PutMateria", "Materia")" class="btn btn-success">Modificar</a>
-        <a href="@Url.Action("CreateMateria", "Materia")" class="btn btn-success">Crear</a>
+        <a href="@Url.Action("PutMateria", "Materia")" class="btn btn-secondary">Modificar</a>
+        <a href="@Url.Action("CreateMateria", "Materia")" class="btn btn-secondary">Crear</a>
     </div>
 </div>
 
 <table class="table table-striped table-bordered align-middle">
     <thead class="table-secondary">
         <tr>
-            <th>Materia</th>
-            <th>Año</th>
-            <th>Modalidad</th>
-            <th style="width:100px;">Acciones</th>
+            <th class="text-center">Materia</th>
+            <th class="text-center">Año</th>
+            <th class="text-center">Modalidad</th>
+            <th class="text-center" style="width:100px;">Acciones</th>
         </tr>
     </thead>
     <tbody id="materiaTable">
@@ -56,7 +56,7 @@
                 <td>@materia.Nombre</td>
                 <td>@materia.Anio</td>
                 <td>@materia.Modalidad</td>
-                <td class="text-center">
+                <td class="text-center acciones">
                     <button type="button" class="btn btn-sm btn-info" onclick="infoMateria('@materia.Nombre')">
                         <i class="bi bi-info-circle"></i>
                     </button>
@@ -98,13 +98,12 @@
                 <p>¿Estás seguro que quieres eliminar la materia <strong id="deleteMateriaNombre"></strong>?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" id="btnConfirmDelete" class="btn btn-danger">Eliminar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             </div>
         </div>
     </div>
 </div>
-
 <div class="modal fade" id="messageModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
