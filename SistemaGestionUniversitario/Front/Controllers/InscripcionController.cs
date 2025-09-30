@@ -77,7 +77,7 @@ namespace Front.Controllers
             {
                 _logger.LogError(ex, "Error al obtener inscripciones por nombre de materia");
                 TempData["Error"] = "Ocurrió un error al buscar inscripciones. Intente nuevamente.";
-                return RedirectToAction("GetInscripcionesAsistencia");
+                return View(new List<InscripcionFront>());
             }
         }
 

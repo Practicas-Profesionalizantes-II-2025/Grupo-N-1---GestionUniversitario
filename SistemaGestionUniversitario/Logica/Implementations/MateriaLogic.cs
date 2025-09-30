@@ -316,7 +316,7 @@ namespace Negocio.Implementations
 
             if (!profesorMaterias.Any())
             {
-                throw new ArgumentException("El profesor con el DNI ingresado no está vinculado a ninguna materia.");
+                return new List<MateriaDTO>();
             }
 
             var idsMaterias = profesorMaterias.Select(pm => pm.IdMateria).ToHashSet();

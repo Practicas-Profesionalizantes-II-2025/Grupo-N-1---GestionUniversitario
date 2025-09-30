@@ -57,7 +57,7 @@ namespace Front.Controllers
                 ViewBag.SelectedMateria = nombreMateria;
 
                 // Si todavía no seleccionó ninguna materia
-                if (string.IsNullOrEmpty(nombreMateria))
+                if (string.IsNullOrEmpty(nombreMateria) || materias == null)
                 {
                     return View(new List<AsistenciaFront>());
                 }

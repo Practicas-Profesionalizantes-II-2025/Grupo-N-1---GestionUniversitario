@@ -26,45 +26,52 @@
 <div class="container">
     <h3>Cargar Asistencias</h3>
 
-    <div class="d-flex align-items-center mb-3">
-        <!-- Fecha -->
-        <div class="me-3">
-            <input type="date"
-                   class="form-control"
-                   id="fechaAsistencia"
-                   value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-        </div>
-        
-        <!-- lista materias-->
-        <form asp-action="GetInscripcionesAsistencia" method="get">
-            <select name="nombreMateria" id="materia" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
-                <option value="">Seleccione una Materia</option>
-                @foreach (var materia in ViewBag.Materias)
-                {
-                    <option value="@materia.Nombre"
-                            selected="@(ViewBag.SelectedMateria == materia.Nombre ? "selected" : null)">
-                        @materia.Nombre
-                    </option>
-                }
-            </select>
-        </form>
-    </div>
+    @if (materias == null || !materias.Any())
+    {
+        <div class="alert alert-warning">⚠️ No tenés ninguna materia vinculada.</div>
+    }
+    else
+    {
+        <div class="d-flex align-items-center mb-3">
+            <!-- Fecha -->
+            <div class="me-3">
+                <input type="date"
+                       class="form-control"
+                       id="fechaAsistencia"
+                       value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
 
-    <!-- Contenedor de alumnos -->
-    <div class="mb-3">
-        <h5>Alumnos</h5>
-        <div id="alumnosContainer" class="d-flex flex-wrap">
-            @foreach (var insc in Model)
-            {
-                <div class="alumno-card border rounded p-2 m-1">
-                    <label>
-                        @insc.NombreAlumno @insc.ApellidoAlumno
-                        <input type="checkbox" class="asistencia" name="asistencias" value="@insc.ID" checked />
-                    </label>
-                </div>
-            }
+            <!-- lista materias-->
+            <form asp-action="GetInscripcionesAsistencia" method="get">
+                <select name="nombreMateria" id="materia" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+                    <option value="">Seleccione una Materia</option>
+                    @foreach (var materia in materias)
+                    {
+                        <option value="@materia.Nombre"
+                                selected="@(ViewBag.SelectedMateria == materia.Nombre ? "selected" : null)">
+                            @materia.Nombre
+                        </option>
+                    }
+                </select>
+            </form>
         </div>
-    </div>
+
+        <!-- Contenedor de alumnos -->
+        <div class="mb-3">
+            <h5>Alumnos</h5>
+            <div id="alumnosContainer" class="d-flex flex-wrap">
+                @foreach (var insc in Model)
+                {
+                    <div class="alumno-card border rounded p-2 m-1">
+                        <label>
+                            @insc.NombreAlumno @insc.ApellidoAlumno
+                            <input type="checkbox" class="asistencia" name="asistencias" value="@insc.ID" checked />
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 
     <!-- Botones -->
     <div class="mb-3 d-flex justify-content-end">
@@ -118,34 +125,3 @@
 </form>
 
 <script src="~/js/asistencias.js"></script>
-
-<script>
-    // Pasamos los días permitidos desde Razor a JS
-    const diasPermitidos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(diasMateria));
-
-    const fechaInput = document.getElementById("fechaAsistencia");
-
-    // Función para validar si la fecha corresponde a un día permitido
-    function esDiaPermitido(fecha) {
-        const diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
-        const diaNombre = diasSemana[fecha.getDay()];
-        return diasPermitidos.includes(diaNombre);
-    }
-
-    // Validar al cambiar la fecha
-    fechaInput.addEventListener("input", function() {
-        const fechaSeleccionada = new Date(this.value);
-        if (!esDiaPermitido(fechaSeleccionada)) {
-            alert("La fecha seleccionada no corresponde a un día en que se dicta esta materia.");
-            this.value = ""; // limpiar input
-        }
-    });
-
-    // Inicializamos con hoy si es día válido
-    const hoy = new Date();
-    if (esDiaPermitido(hoy)) {
-        fechaInput.valueAsDate = hoy;
-    } else {
-        fechaInput.value = "";
-    }
-</script>
