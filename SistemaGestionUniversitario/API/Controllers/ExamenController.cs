@@ -22,12 +22,7 @@ namespace API.Controllers
         {
             List<ExamenDTO> examenDTO = await _examenLogic.ObtenerExamenes();
 
-            if (examenDTO.Count == 0)
-            {
-                return NoContent();
-            }
-
-            return Ok(examenDTO);
+            return Ok(examenDTO ?? new List<ExamenDTO>());
         }
 
         [HttpGet("{nombreMateria}")]
