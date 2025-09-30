@@ -1,4 +1,5 @@
 ﻿using Datos.Repositories.Contracts;
+using Datos.Repositories.Implementations;
 using Entidades.DTOs.Respuestas;
 using Entidades.Entities;
 using Logica.Contracts;
@@ -10,12 +11,16 @@ namespace Logica.Implementations
         private IInscripcionRepository _inscripcionRepository;
         private IMateriaRepository _materiaRepository;
         private IAlumnoRepository _alumnoRepository;
+        private IExamenRepository _examenRepository;
+        private INotaAlumnoRepository _notaAlumnoRepository;
 
-        public InscripcionLogic(IInscripcionRepository inscripcionRepository, IMateriaRepository materiaRepository, IAlumnoRepository alumnoRepository)
+        public InscripcionLogic(IInscripcionRepository inscripcionRepository, IMateriaRepository materiaRepository, IAlumnoRepository alumnoRepository, IExamenRepository examenRepository, INotaAlumnoRepository notaAlumnoRepository)
         {
             _inscripcionRepository = inscripcionRepository;
             _materiaRepository = materiaRepository;
             _alumnoRepository = alumnoRepository;
+            _examenRepository = examenRepository;
+            _notaAlumnoRepository = notaAlumnoRepository;
         }
 
         public async Task AltaInscripcion(string dniAlumno, string nombreMateria)
@@ -143,6 +148,9 @@ namespace Logica.Implementations
                     return new List<InscripcionDTO>();
                 }
 
+                List<Examen> examenesFinalesMateria = (await _examenRepository.FindByConditionAsync(p => p.Materia.ID == materiaFiltro.ID && p.Tipo == "Final")).ToList();
+                var idsExamenesFinales = examenesFinalesMateria.Select(e => e.ID).ToList();
+
                 List<InscripcionDTO> listaInscripcionesDTO = new List<InscripcionDTO>();
                 foreach (Inscripcion inscripcion in listaInscripciones)
                 {
@@ -153,19 +161,28 @@ namespace Logica.Implementations
                         throw new ArgumentNullException("ID de alumno invalido.");
                     }
 
-                    InscripcionDTO inscripcionDTO = new InscripcionDTO()
-                    {
-                        ID = inscripcion.ID,
-                        IdAlumno = alumnoExistente.ID,
-                        NombreAlumno = alumnoExistente.Usuario.Nombre,
-                        ApellidoAlumno = alumnoExistente.Usuario.Apellido,
-                        DNIAlumno = alumnoExistente.Usuario.DNI,
-                        Estado = inscripcion.Estado ? "Aprobado" : "En Curso",
-                        IdMateria = materiaFiltro.ID,
-                        NombreMateria = materiaFiltro.Nombre
-                    };
+                    bool tieneFinalAprobado = (await _notaAlumnoRepository.FindByConditionAsync(
+                        p => p.Nota >= 6
+                             && p.IdAlumno == alumnoExistente.ID
+                             && idsExamenesFinales.Contains(p.IdExamen)
+                    )).Any();
 
-                    listaInscripcionesDTO.Add(inscripcionDTO);
+                    if (!tieneFinalAprobado)
+                    {
+                        InscripcionDTO inscripcionDTO = new InscripcionDTO()
+                        {
+                            ID = inscripcion.ID,
+                            IdAlumno = alumnoExistente.ID,
+                            NombreAlumno = alumnoExistente.Usuario.Nombre,
+                            ApellidoAlumno = alumnoExistente.Usuario.Apellido,
+                            DNIAlumno = alumnoExistente.Usuario.DNI,
+                            Estado = inscripcion.Estado ? "Aprobado" : "En Curso",
+                            IdMateria = materiaFiltro.ID,
+                            NombreMateria = materiaFiltro.Nombre
+                        };
+
+                        listaInscripcionesDTO.Add(inscripcionDTO);
+                    }                 
                 }
 
                 return listaInscripcionesDTO;
