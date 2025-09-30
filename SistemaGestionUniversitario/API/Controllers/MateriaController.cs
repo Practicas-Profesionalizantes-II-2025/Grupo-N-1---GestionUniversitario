@@ -23,12 +23,7 @@ namespace API.Controllers
         {
             List<MateriaDTO> materiasDTO = await _materiaLogic.ObtenerMaterias();
 
-            if (materiasDTO.Count == 0)
-            {
-                return NoContent();
-            }
-
-            return Ok(materiasDTO);
+            return Ok(materiasDTO ?? new List<MateriaDTO>());
         }
 
         [HttpGet("NombreMateria/{nombreMateria}")]
