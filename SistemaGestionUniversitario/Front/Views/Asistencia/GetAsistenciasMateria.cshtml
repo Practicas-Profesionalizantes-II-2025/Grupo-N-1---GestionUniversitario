@@ -9,82 +9,89 @@
 <div class="container">
     <h3>Registro de Asistencias</h3>
 
-    <!-- Selección de Materia -->
-    <form asp-action="GetAsistenciasMateria" method="get" class="mb-3">
-        <select name="nombreMateria" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
-            <option value="">Seleccione una Materia</option>
-            @if (materias != null)
-            {
-                foreach (var materia in materias)
-                {
-                    <option value="@materia.Nombre"
-                            selected="@(selectedMateria == materia.Nombre ? "selected" : null)">
-                        @materia.Nombre
-                    </option>
-                }
-            }
-        </select>
-    </form>
-
-    @if (!string.IsNullOrEmpty(selectedMateria))
+    @if (!materias.Any())
     {
-        if (!Model.Any())
-        {
-            <div class="alert alert-info">
-                No hay asistencias registradas para esta materia.
-            </div>
-        }
-        else
-        {
-            <div class="accordion" id="accordionAsistencias">
-                @foreach (var grupo in Model.GroupBy(a => a.Fecha.Date))
+        <div class="alert alert-warning">⚠️ No tenés ninguna materia vinculada.</div>
+    }
+    else
+    {
+        <!-- Selección de Materia -->
+        <form asp-action="GetAsistenciasMateria" method="get" class="mb-3">
+            <select name="nombreMateria" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
+                <option value="">Seleccione una Materia</option>
+                @if (materias != null)
                 {
-                    var fechaId = grupo.Key.ToString("yyyyMMdd");
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading-@fechaId">
-                            <button class="accordion-button collapsed" type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#collapse-@fechaId"
-                                    aria-expanded="false"
-                                    aria-controls="collapse-@fechaId">
-                                📅 @grupo.Key.ToString("dd/MM/yyyy")
-                            </button>
-                        </h2>
-                        <div id="collapse-@fechaId" class="accordion-collapse collapse"
-                             aria-labelledby="heading-@fechaId" data-bs-parent="#accordionAsistencias">
-                            <div class="accordion-body">
-                                <!-- Form para esta fecha -->
-                                <form asp-action="ModAsistencia" asp-controller="Asistencia" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="nombreMateria" value="@selectedMateria" />
+                    foreach (var materia in materias)
+                    {
+                        <option value="@materia.Nombre"
+                                selected="@(selectedMateria == materia.Nombre ? "selected" : null)">
+                            @materia.Nombre
+                        </option>
+                    }
+                }
+            </select>
+        </form>
 
-                                    @for (int i = 0; i < grupo.Count(); i++)
-                                    {
-                                        var asistencia = grupo.ElementAt(i);
-                                        <div class="form-check">
-                                            <input type="checkbox"
-                                                   class="form-check-input"
-                                                   name="asistencias[@i].Estado"
-                                                   value="true"
-                                                   @(asistencia.Estado ? "checked" : "") />
-                                            <input type="hidden" name="asistencias[@i].IdInscripcion" value="@asistencia.IdInscripcion" />
-                                            <input type="hidden" name="asistencias[@i].NombreMateria" value="@asistencia.NombreMateria" />
-                                            <input type="hidden" name="asistencias[@i].Fecha" value="@asistencia.Fecha.ToString("yyyy-MM-dd")" />
-                                            <label class="form-check-label">@asistencia.NombreAlumno @asistencia.ApellidoAlumno</label>
+        @if (!string.IsNullOrEmpty(selectedMateria))
+        {
+            if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    No hay asistencias registradas para esta materia.
+                </div>
+            }
+            else
+            {
+                <div class="accordion" id="accordionAsistencias">
+                    @foreach (var grupo in Model.GroupBy(a => a.Fecha.Date))
+                    {
+                        var fechaId = grupo.Key.ToString("yyyyMMdd");
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading-@fechaId">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-@fechaId"
+                                        aria-expanded="false"
+                                        aria-controls="collapse-@fechaId">
+                                    📅 @grupo.Key.ToString("dd/MM/yyyy")
+                                </button>
+                            </h2>
+                            <div id="collapse-@fechaId" class="accordion-collapse collapse"
+                                 aria-labelledby="heading-@fechaId" data-bs-parent="#accordionAsistencias">
+                                <div class="accordion-body">
+                                    <!-- Form para esta fecha -->
+                                    <form asp-action="ModAsistencia" asp-controller="Asistencia" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="nombreMateria" value="@selectedMateria" />
+
+                                        @for (int i = 0; i < grupo.Count(); i++)
+                                        {
+                                            var asistencia = grupo.ElementAt(i);
+                                            <div class="form-check">
+                                                <input type="checkbox"
+                                                       class="form-check-input"
+                                                       name="asistencias[@i].Estado"
+                                                       value="true"
+                                                @(asistencia.Estado ? "checked" : "") />
+                                                <input type="hidden" name="asistencias[@i].IdInscripcion" value="@asistencia.IdInscripcion" />
+                                                <input type="hidden" name="asistencias[@i].NombreMateria" value="@asistencia.NombreMateria" />
+                                                <input type="hidden" name="asistencias[@i].Fecha" value="@asistencia.Fecha.ToString("yyyy-MM-dd")" />
+                                                <label class="form-check-label">@asistencia.NombreAlumno @asistencia.ApellidoAlumno</label>
+                                            </div>
+                                        }
+
+                                        <!-- Botones para esta fecha -->
+                                        <div class="mt-3 d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-secondary me-2">Aceptar</button>
+                                            <button type="reset" class="btn btn-secondary">Cancelar</button>
                                         </div>
-                                    }
-
-                                    <!-- Botones para esta fecha -->
-                                    <div class="mt-3 d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-secondary me-2">Aceptar</button>
-                                        <button type="reset" class="btn btn-secondary">Cancelar</button>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
         }
     }
 </div>
