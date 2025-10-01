@@ -173,6 +173,9 @@ namespace Logica.Implementations
                 if (alumno == null || alumno.Usuario == null)
                     continue;
 
+                if (asistencia.Fecha.Year != DateTime.Now.Year)
+                    continue;
+
                 // Crear DTO
                 AsistenciaDTO asistenciaDTO = new AsistenciaDTO
                 {
