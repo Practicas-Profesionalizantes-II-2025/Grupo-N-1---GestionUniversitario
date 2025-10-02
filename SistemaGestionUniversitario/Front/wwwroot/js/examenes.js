@@ -114,4 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
     searchBox.addEventListener("input", aplicarFiltros);
     chkFinal.addEventListener("change", aplicarFiltros);
     chkParcial.addEventListener("change", aplicarFiltros);
+
+    //modal notas
+    const notasModal = document.getElementById('cargarNotasModal');
+    notasModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const examenId = button.getAttribute('data-id');
+        const materia = button.getAttribute('data-materia');
+
+        // Setear ID examen en hidden input
+        document.getElementById('notaExamenId').value = examenId;
 });

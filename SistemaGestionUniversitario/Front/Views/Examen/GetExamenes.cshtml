@@ -163,4 +163,66 @@
     </div>
 </div>
 
+<!-- MODAL CARGAR NOTAS -->
+<div class="modal fade" id="cargarNotasModal" tabindex="-1" aria-labelledby="cargarNotasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-3">
+            <form id="cargarNotasForm" method="post" asp-controller="NotaAlumno" asp-action="CrearNotaAlumno">
+                @Html.AntiForgeryToken()
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="cargarNotasLabel">
+                        <i class="bi bi-pencil-square me-2"></i> Cargar Notas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="notaExamenId" name="IDExamen" />
+
+                    <!-- Tabla de alumnos -->
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Alumno</th>
+                                    <th>DNI</th>
+                                    <th>Nota</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAlumnosNotas">
+                                <!-- Se rellena dinámicamente con los inscriptos -->
+                                <tr>
+                                    <td>Juan Pérez</td>
+                                    <td>12345678</td>
+                                    <td>
+                                        <input type="number" class="form-control nota-input" name="Notas[0].Nota" min="0" max="100" required />
+                                        <input type="hidden" name="Notas[0].DNIAlumno" value="12345678" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>María López</td>
+                                    <td>87654321</td>
+                                    <td>
+                                        <input type="number" class="form-control nota-input" name="Notas[1].Nota" min="0" max="100" required />
+                                        <input type="hidden" name="Notas[1].DNIAlumno" value="87654321" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i> Guardar Notas
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="~/js/examenes.js?v=@DateTime.Now.Ticks"></script>
