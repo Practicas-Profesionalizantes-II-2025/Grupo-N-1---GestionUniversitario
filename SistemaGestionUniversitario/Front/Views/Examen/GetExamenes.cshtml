@@ -74,6 +74,16 @@
                             data-fecha="@examen.Fecha.ToString("dd/MM/yyyy")">
                         <i class="bi bi-trash"></i>
                     </button>
+                    <!-- Botón notas -->
+                    <button type="button"
+                            class="btn btn-sm btn-success"
+                            data-bs-toggle="modal"
+                            data-bs-target="#cargarNotasModal"
+                            data-id="@examen.ID"
+                            data-materia="@examen.NombreMateria"
+                            data-tipo="@examen.Tipo">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
                 </td>
             </tr>
         }
