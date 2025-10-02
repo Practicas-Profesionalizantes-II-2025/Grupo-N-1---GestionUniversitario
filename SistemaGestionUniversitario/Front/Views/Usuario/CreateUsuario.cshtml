@@ -4,72 +4,71 @@
     ViewData["Title"] = "CreateUsuario";
 }
 
-<h2 class="text-center py-2 bg-secondary text-white rounded">Nuevo Usuario</h2>
-<hr />
+<div class="container" style="max-width: 800px;">
+    <!-- limita ancho -->
+    <h2 class="text-center py-2 bg-secondary text-white rounded">Nuevo Usuario</h2>
+    <hr />
 
-<form asp-action="CreateUsuario">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form asp-action="CreateUsuario">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="row">
-        <!-- Columna izquierda -->
-        <div class="col-md-6">
-            <div class="mb-3">
+        <div class="row">
+            <div class="col-md-6 mb-3">
                 <label asp-for="DNI" class="form-label">Usuario (DNI) *</label>
                 <input asp-for="DNI" class="form-control" />
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 <label asp-for="Nombre" class="form-label">Nombre/s *</label>
                 <input asp-for="Nombre" class="form-control" />
             </div>
-            <div class="mb-3">
-                <label asp-for="CaracteristicaTelefono" class="form-label">Característica *</label>
-                <input asp-for="CaracteristicaTelefono" class="form-control" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="Localidad" class="form-label">Localidad *</label>
-                <input asp-for="Localidad" class="form-control" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="Direccion" class="form-label">Dirección *</label>
-                <input asp-for="Direccion" class="form-control" />
-            </div>
-        </div>
 
-        <!-- Columna derecha -->
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label">Contraseña *</label>
-                <input asp-for="Password" class="form-control" type="password" />
-            </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 <label asp-for="Apellido" class="form-label">Apellido/s *</label>
                 <input asp-for="Apellido" class="form-control" />
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Password" class="form-label">Contraseña *</label>
+                <input asp-for="Password" class="form-control" type="password" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="CaracteristicaTelefono" class="form-label">Característica *</label>
+                <input asp-for="CaracteristicaTelefono" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
                 <label asp-for="NumeroTelefono" class="form-label">Teléfono *</label>
                 <input asp-for="NumeroTelefono" class="form-control" />
             </div>
-            <div class="mb-3">
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Localidad" class="form-label">Localidad *</label>
+                <input asp-for="Localidad" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="Direccion" class="form-label">Dirección *</label>
+                <input asp-for="Direccion" class="form-control" />
+            </div>
+
+            <div class="col-md-6 mb-3">
                 <label asp-for="RolUsuarioDescripcion" class="form-label">Rol *</label>
                 <select asp-for="RolUsuarioDescripcion" asp-items="ViewBag.Roles"
                         class="form-select required-field" id="rolSelect">
                     <option value="">Seleccione...</option>
                 </select>
             </div>
-            <div class="mb-3">
+            <div class="col-md-6 mb-3">
                 <label id="fechaLabel" asp-for="FechaContratoIngreso" class="form-label">Fecha *</label>
                 <input asp-for="FechaContratoIngreso" class="form-control required-field"
                        type="date" id="fechaInput" />
-            </div>     
+            </div>
         </div>
-    </div>
 
-    <!-- Botones -->
-    <div class="d-flex justify-content-end mt-3">
-        <input type="submit" value="Aceptar" class="btn btn-secondary me-2" id="btnAceptar" />
-        <a asp-action="GetUsuarios" class="btn btn-secondary">Cancelar</a>
-    </div>
-</form>
+        <div class="d-flex justify-content-end mt-3">
+            <input type="submit" value="Aceptar" class="btn btn-secondary me-2" id="btnAceptar" />
+            <a asp-action="GetUsuarios" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -79,7 +78,6 @@
 
         function actualizarFechaLabel() {
             const rol = rolSelect.value;
-
             if (rol === "Profesor") {
                 fechaLabel.textContent = "Fecha Inicio Contrato";
                 fechaInput.disabled = false;
