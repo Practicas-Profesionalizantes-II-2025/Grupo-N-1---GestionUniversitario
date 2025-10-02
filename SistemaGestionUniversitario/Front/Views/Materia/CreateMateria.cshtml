@@ -8,10 +8,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/materia.css" />
 
-    <div class="container mt-5">
-        <div class="card shadow-lg p-4 rounded-3">
-            <div class="card-body">
-                <h2>Crear Materia</h2>
+<div class="d-flex justify-content-center">
+    <div class="col-md-6">
+        <h2 class="text-center py-2 bg-secondary text-white rounded">Crear Materia</h2>
 
                 <form asp-action="CreateMateria" method="post">
 
@@ -92,9 +91,8 @@
                     <button type="submit" class="btn btn-primary">Aceptar</button>
                     <a asp-action="GetMaterias" class="btn btn-secondary">Cancelar</a>
                 </form>
-            </div>
-        </div>
     </div>
+</div>
     @section ScriptsDropdown {
     <script>
         // Función para mostrar/ocultar el desplegable de profesores
