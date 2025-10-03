@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -45,6 +46,24 @@ namespace Front.Controllers
             {
                 _logger.LogError(ex, "Error al obtener exámenes desde la API");
                 return Content($"Error al obtener exámenes: {ex.Message}\n\n{ex.StackTrace}");
+            }
+        }
+        // GET: /Examen/GetAlumnosPorMateria/nombreMateria
+        [Authorize(Roles = "Profesor")]
+        [HttpGet]
+        public async Task<IActionResult> GetAlumnosPorMateria(string nombreMateria)
+        {
+            try
+            {
+                var alumnosInscriptos = await _httpClient.GetFromJsonAsync<List<InscripcionFront>>(
+                    $"Inscripcion/PorMateria/{nombreMateria}");
+
+                return Json(alumnosInscriptos ?? new List<InscripcionFront>());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener inscripciones");
+                return BadRequest(new { mensaje = "Error al traer alumnos inscriptos" });
             }
         }
 
