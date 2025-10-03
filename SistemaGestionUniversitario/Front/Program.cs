@@ -9,7 +9,7 @@ builder.Services.AddControllersWithViews();
 // Registro de HttpClient hacia APIs
 builder.Services.AddHttpClient("ApiPrincipal", client =>
 {
-	client.BaseAddress = new Uri("https://localhost:5227/api/");
+	client.BaseAddress = new Uri("https://localhost:7068/api/");
 });
 
 // Sesion
