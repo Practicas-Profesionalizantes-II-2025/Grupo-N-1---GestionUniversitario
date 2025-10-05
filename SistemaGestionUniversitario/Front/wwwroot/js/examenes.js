@@ -114,14 +114,62 @@ document.addEventListener("DOMContentLoaded", () => {
     searchBox.addEventListener("input", aplicarFiltros);
     chkFinal.addEventListener("change", aplicarFiltros);
     chkParcial.addEventListener("change", aplicarFiltros);
-
-    //modal notas
-    const notasModal = document.getElementById('cargarNotasModal');
-    notasModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const examenId = button.getAttribute('data-id');
-        const materia = button.getAttribute('data-materia');
-
-        // Setear ID examen en hidden input
-        document.getElementById('notaExamenId').value = examenId;
 });
+    //modal notas
+        // Setear ID examen en hidden input
+    document.addEventListener('DOMContentLoaded', function () 
+    {
+
+        // Cuando se abre el modal de notas
+        const cargarNotasModal = document.getElementById('cargarNotasModal');
+
+        cargarNotasModal.addEventListener('show.bs.modal', async function (event) {
+            const button = event.relatedTarget;
+            const nombreMateria = button.getAttribute('data-materia'); // ← viene del botón del examen
+            console.log("Nombre de la materia:", nombreMateria);
+            const examenId = button.getAttribute('data-id');
+
+            // Asignamos el ID del examen al campo oculto del formulario
+            document.getElementById('notaExamenId').value = examenId;
+
+            // Limpiamos la tabla antes de cargar los nuevos datos
+            const tablaBody = document.getElementById('tablaAlumnosNotas');
+            tablaBody.innerHTML = '';
+
+            try {
+                // Llamamos al método del controlador
+                const response = await fetch(`/Examen/GetAlumnosPorMateria?nombreMateria=${encodeURIComponent(nombreMateria)}`);
+
+                if (!response.ok) {
+                    throw new Error('Error al obtener alumnos');
+                }
+
+                const alumnos = await response.json();
+                console.log("Alumnos:", alumnos);
+
+                // Si no hay alumnos, mostramos un mensaje
+                if (alumnos.length === 0) {
+                    tablaBody.innerHTML = '<tr><td colspan="3" class="text-center">No hay alumnos inscriptos.</td></tr>';
+                    return;
+                }
+
+                // Rellenamos la tabla con los alumnos inscriptos
+                alumnos.forEach((alumno, index) => {
+                    const fila = document.createElement('tr');
+                    fila.innerHTML = `
+                    <td>${alumno.nombreAlumno} ${alumno.apellidoAlumno}</td>
+                    <td>${alumno.dniAlumno}</td>
+                    <td>
+                        <input type="number" class="form-control nota-input" name="Notas[${index}].Nota" min="0" max="100" required />
+                        <input type="hidden" name="Notas[${index}].DNIAlumno" value="${alumno.dni}" />
+                    </td>
+                `;
+                    tablaBody.appendChild(fila);
+                });
+
+            } catch (error) {
+                console.error('Error al cargar alumnos:', error);
+                tablaBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Error al cargar los alumnos.</td></tr>';
+            }
+        });
+    });
