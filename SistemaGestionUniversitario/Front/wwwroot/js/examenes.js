@@ -1,5 +1,4 @@
-﻿
-///////////////////////
+﻿///////////////////////
 // INFORMACION
 ////////////////////
 document.addEventListener('DOMContentLoaded', () => {
@@ -116,60 +115,114 @@ document.addEventListener("DOMContentLoaded", () => {
     chkParcial.addEventListener("change", aplicarFiltros);
 });
     //modal notas
-        // Setear ID examen en hidden input
-    document.addEventListener('DOMContentLoaded', function () 
-    {
+document.addEventListener('DOMContentLoaded', function () {
 
-        // Cuando se abre el modal de notas
-        const cargarNotasModal = document.getElementById('cargarNotasModal');
+    const cargarNotasModal = document.getElementById('cargarNotasModal');
+    const cargarNotasForm = document.getElementById('cargarNotasForm');
+    const tablaBody = document.getElementById('tablaAlumnosNotas');
+    const examenIdInput = document.getElementById('notaExamenId');
 
-        cargarNotasModal.addEventListener('show.bs.modal', async function (event) {
-            const button = event.relatedTarget;
-            const nombreMateria = button.getAttribute('data-materia'); // ← viene del botón del examen
-            console.log("Nombre de la materia:", nombreMateria);
-            const examenId = button.getAttribute('data-id');
+    // Cuando se abre el modal de notas
+    cargarNotasModal.addEventListener('show.bs.modal', async function (event) {
+        const button = event.relatedTarget;
+        const nombreMateria = button.getAttribute('data-materia');
+        const examenId = button.getAttribute('data-id');
 
-            // Asignamos el ID del examen al campo oculto del formulario
-            document.getElementById('notaExamenId').value = examenId;
+        console.log("Materia:", nombreMateria);
+        console.log("Examen ID:", examenId);
 
-            // Limpiamos la tabla antes de cargar los nuevos datos
-            const tablaBody = document.getElementById('tablaAlumnosNotas');
-            tablaBody.innerHTML = '';
+        examenIdInput.value = examenId;
+        tablaBody.innerHTML = ''; // limpiar tabla
 
-            try {
-                // Llamamos al método del controlador
-                const response = await fetch(`/Examen/GetAlumnosPorMateria?nombreMateria=${encodeURIComponent(nombreMateria)}`);
+        try {
+            const response = await fetch(`/Examen/GetAlumnosPorMateria?nombreMateria=${encodeURIComponent(nombreMateria)}`);
+            if (!response.ok) throw new Error('Error al obtener alumnos');
 
-                if (!response.ok) {
-                    throw new Error('Error al obtener alumnos');
-                }
+            const alumnos = await response.json();
+            console.log("Alumnos:", alumnos);
 
-                const alumnos = await response.json();
-                console.log("Alumnos:", alumnos);
+            if (alumnos.length === 0) {
+                tablaBody.innerHTML = '<tr><td colspan="3" class="text-center">No hay alumnos inscriptos.</td></tr>';
+                return;
+            }
 
-                // Si no hay alumnos, mostramos un mensaje
-                if (alumnos.length === 0) {
-                    tablaBody.innerHTML = '<tr><td colspan="3" class="text-center">No hay alumnos inscriptos.</td></tr>';
-                    return;
-                }
-
-                // Rellenamos la tabla con los alumnos inscriptos
-                alumnos.forEach((alumno, index) => {
-                    const fila = document.createElement('tr');
-                    fila.innerHTML = `
+            alumnos.forEach((alumno, index) => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
                     <td>${alumno.nombreAlumno} ${alumno.apellidoAlumno}</td>
                     <td>${alumno.dniAlumno}</td>
                     <td>
-                        <input type="number" class="form-control nota-input" name="Notas[${index}].Nota" min="0" max="100" required />
-                        <input type="hidden" name="Notas[${index}].DNIAlumno" value="${alumno.dni}" />
+                        <input type="number" class="form-control nota-input" data-dni="${alumno.dniAlumno}" min="0" max="10" placeholder="Nota" required />
                     </td>
                 `;
-                    tablaBody.appendChild(fila);
-                });
+                tablaBody.appendChild(fila);
+            });
 
-            } catch (error) {
-                console.error('Error al cargar alumnos:', error);
-                tablaBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Error al cargar los alumnos.</td></tr>';
+        } catch (error) {
+            console.error('Error al cargar alumnos:', error);
+            tablaBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Error al cargar los alumnos.</td></tr>';
+        }
+    });
+
+    // Cuando se envía el formulario de notas
+    cargarNotasForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const examenId = examenIdInput.value;
+        const notaInputs = tablaBody.querySelectorAll('.nota-input');
+        const notas = [];
+
+        notaInputs.forEach(input => {
+            const nota = parseInt(input.value);
+            const dni = input.getAttribute('data-dni');
+            console.log ("dni:", dni);
+
+            if (!isNaN(nota)) {
+                notas.push({
+                    nota: nota,
+                    dniAlumno: dni,
+                    idExamen: parseInt(examenId)
+                });
             }
         });
+
+        if (notas.length === 0) {
+            alert("No se ingresaron notas.");
+            return;
+        }
+
+        console.log("Notas a enviar:", notas);
+
+        try {
+            const response = await fetch('/Examen/CargarNotas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify(notas)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+
+            const result = await response.json();
+            console.log("Respuesta:", result);
+
+            // Mostrar mensaje de éxito
+            var modal = new bootstrap.Modal(document.getElementById('mensajeModal'));
+            modal.show();
+
+            // Cerrar modal y limpiar tabla
+            const modalInstance = bootstrap.Modal.getInstance(cargarNotasModal);
+            modalInstance.hide();
+            tablaBody.innerHTML = '';
+
+        } catch (error) {
+            console.error("Error al guardar notas:", error);
+            alert("❌ Error al guardar las notas. Revisa la consola para más detalles.");
+        }
     });
+});
