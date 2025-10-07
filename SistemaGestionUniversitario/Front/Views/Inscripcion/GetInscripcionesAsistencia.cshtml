@@ -33,17 +33,9 @@
     else
     {
         <div class="d-flex align-items-center mb-3">
-            <!-- Fecha -->
-            <div class="me-3">
-                <input type="date"
-                       class="form-control"
-                       id="fechaAsistencia"
-                       value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-            </div>
-
             <!-- lista materias-->
             <form asp-action="GetInscripcionesAsistencia" method="get">
-                <select name="nombreMateria" id="materia" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+                <select name="nombreMateria" id="materia" class="form-select d-inline-block w-auto me-3" onchange="this.form.submit()">
                     <option value="">Seleccione una Materia</option>
                     @foreach (var materia in materias)
                     {
@@ -54,6 +46,14 @@
                     }
                 </select>
             </form>
+
+            <!-- Fecha -->
+            <div class="me-3">
+                <input type="date"
+                       class="form-control"
+                       id="fechaAsistencia"
+                       value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
         </div>
 
         <!-- Contenedor de alumnos -->
