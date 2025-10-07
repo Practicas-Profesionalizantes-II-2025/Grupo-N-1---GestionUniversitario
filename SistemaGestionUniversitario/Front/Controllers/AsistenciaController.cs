@@ -157,5 +157,40 @@ namespace Front.Controllers
                 return RedirectToAction("GetAsistenciasMateria", "Asistencia");
             }
         }
+
+        // DELETE: /Asistencia/nombreMateria/fecha
+        [Authorize(Roles = "Profesor")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteAsistencia(string nombreMateria, DateTime fecha)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.DeleteAsync($"Asistencia/{nombreMateria}/{fecha:yyyy-MM-dd}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        string error = await response.Content.ReadAsStringAsync();
+                        TempData["Error"] = $"Error de validación: {error}";
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Ocurrió un error inesperado al dar de baja la asistencia.";
+                    }
+
+                    return RedirectToAction("GetAsistenciasMateria", new { nombreMateria });
+                }
+
+                TempData["Success"] = "Asistencia dada de baja correctamente.";
+                return RedirectToAction("GetAsistenciasMateria", new { nombreMateria });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al dar de baja la asistencia");
+                TempData["Error"] = "Ocurrió un error al dar de baja la asistencia.";
+                return RedirectToAction("GetAsistenciasMateria", new { nombreMateria });
+            }
+        }
     }
 }

@@ -59,8 +59,9 @@
                             <div id="collapse-@fechaId" class="accordion-collapse collapse"
                                  aria-labelledby="heading-@fechaId" data-bs-parent="#accordionAsistencias">
                                 <div class="accordion-body">
-                                    <!-- Form para esta fecha -->
-                                    <form asp-action="ModAsistencia" asp-controller="Asistencia" method="post">
+
+                                    <!-- Form principal de modificación -->
+                                    <form asp-action="ModAsistencia" asp-controller="Asistencia" method="post" id="form-modificar-@fechaId">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="nombreMateria" value="@selectedMateria" />
 
@@ -79,15 +80,54 @@
                                                 <label class="form-check-label">@asistencia.NombreAlumno @asistencia.ApellidoAlumno</label>
                                             </div>
                                         }
-
-                                        <!-- Botones para esta fecha -->
-                                        <div class="mt-3 d-flex justify-content-end">
-                                            <button type="submit" class="btn btn-secondary me-2">Aceptar</button>
-                                            <button type="reset" class="btn btn-secondary">Cancelar</button>
-                                        </div>
                                     </form>
+
+                                    <!-- fila de botones (fuera del form principal) -->
+                                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                                        <!-- botón que abre el modal -->
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar-@fechaId">
+                                            Eliminar
+                                        </button>
+
+                                        <!-- botones del form principal -->
+                                        <div>
+                                            <button type="submit" class="btn btn-secondary me-2" form="form-modificar-@fechaId">Modificar</button>
+                                            <button type="reset" class="btn btn-secondary" form="form-modificar-@fechaId">Cancelar</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- modal de confirmación -->
+                                    <div class="modal fade" id="modalEliminar-@fechaId" tabindex="-1" aria-labelledby="modalLabel-@fechaId" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalLabel-@fechaId">Confirmar eliminación</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Seguro que querés eliminar la asistencia del <strong>@grupo.Key.ToString("dd/MM/yyyy")</strong>?
+                                                    <br>
+                                                    Esta acción no se puede deshacer.
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                                                    <!-- formulario real de eliminación -->
+                                                    <form asp-action="DeleteAsistencia" asp-controller="Asistencia" method="post" class="m-0">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="nombreMateria" value="@selectedMateria" />
+                                                        <input type="hidden" name="fecha" value="@grupo.Key.ToString("yyyy-MM-dd")" />
+                                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
+
+
                         </div>
                     }
                 </div>

@@ -75,6 +75,21 @@ namespace API.Controllers
             }
         }
 
+        [HttpDelete("{nombreMateria}/{fecha}")]
+        public async Task<IActionResult> Eliminar(string nombreMateria, DateTime fecha)
+        {
+            try
+            {
+                await _asistenciaLogic.EliminarAsistencia(nombreMateria, fecha);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
         // ------ Se deja codigo por si se cambia la forma de tomar la asistencia, pero por el momento no se usa ------
         #region
         //[HttpPut("{dniAlumno}/{nombreMateria}")]
@@ -95,21 +110,6 @@ namespace API.Controllers
         //    {
         //        return BadRequest(new { mensaje = ex.Message });
         //    }       
-        //}
-
-        //[HttpDelete("{dniAlumno}/{nombreMateria}/{fecha}")]
-        //public async Task<IActionResult> Eliminar(string dniAlumno, string nombreMateria, DateTime fecha)
-        //{
-        //    try
-        //    {
-        //        await _asistenciaLogic.EliminarAsistencia(dniAlumno, nombreMateria, fecha);
-
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex);
-        //    }
         //}
         #endregion
     }
