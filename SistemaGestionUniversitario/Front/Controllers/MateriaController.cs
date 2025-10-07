@@ -4,6 +4,7 @@ using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 namespace Front.Controllers
 {
     public class MateriaController : Controller
@@ -139,7 +140,7 @@ namespace Front.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateMateria(ModificarMateriaFront materia)
         {
-           
+
             try
             {
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Materia/{materia.MateriaSeleccionada}", materia);
@@ -164,7 +165,7 @@ namespace Front.Controllers
                     materia.DiasHorarios = await _httpClient.GetFromJsonAsync<List<DiaHorarioFront>>("DiaHorario") ?? new();
                     return View("PutMateria", materia);
                 }
-                
+
                 TempData["Success"] = "Materia actualizada correctamente.";
                 return RedirectToAction("GetMaterias");
             }
@@ -213,8 +214,41 @@ namespace Front.Controllers
                 return StatusCode(500, "Ocurrió un error al eliminar la materia.");
             }
         }
-        
 
+        [Authorize(Roles = "Profesor")]
+        [HttpGet("PorProfesor")]
+        public async Task<IActionResult> GetMateriasPorProfesor()
+        {
+            try
+            {
+                // Obtener el DNI del profesor logueado desde los claims
+                string dniProfesor = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(dniProfesor))
+                {
+                    _logger.LogWarning("No se encontró el DNI en los claims del usuario logueado.");
+                    return Unauthorized("No se pudo identificar al profesor.");
+                }
+
+                // Llamar al endpoint del backend con el DNI del profesor
+                List<MateriaFront>? materias = await _httpClient.GetFromJsonAsync<List<MateriaFront>>(
+                    $"Materia/DNIProfesor/{dniProfesor}"
+                );
+
+                if (materias == null || !materias.Any())
+                {
+                    ViewBag.Mensaje = "No tenés materias asignadas.";
+                    return View("GetMaterias", new List<MateriaFront>());
+                }
+
+                return View("GetMaterias", materias);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener materias del profesor desde la API");
+                return Content($"Error al obtener materias del profesor: {ex.Message}");
+            }
+        }
 
     }
 }

@@ -31,15 +31,26 @@ namespace Front.Controllers
         [HttpGet]
         public async Task<IActionResult> GetExamenes()
         {
-            List<HorarioFront>? horario = await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario");
-            ViewBag.Horarios = new SelectList(horario, "Descripcion", "Descripcion");
-
-            List<MateriaFront>? materia = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia");
-            ViewBag.Materias = new SelectList(materia, "Nombre", "Nombre");
-
             try
             {
+               List<HorarioFront>? horarios = await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario");
+                ViewBag.Horarios = new SelectList(horarios ?? new List<HorarioFront>(), "Descripcion", "Descripcion");
+
+                string dniProfesor = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                List<MateriaFront>? materiasDelProfesor = await _httpClient
+                    .GetFromJsonAsync<List<MateriaFront>>($"Materia/DNIProfesor/{dniProfesor}");
+
+                ViewBag.Materias = new SelectList(materiasDelProfesor ?? new List<MateriaFront>(), "Nombre", "Nombre");
+
                 List<ExamenFront>? examenes = await _httpClient.GetFromJsonAsync<List<ExamenFront>>("Examen");
+
+                if (materiasDelProfesor != null && examenes != null)
+                {
+                    var nombresMateriasProfesor = materiasDelProfesor.Select(m => m.Nombre).ToHashSet();
+                    examenes = examenes.Where(e => nombresMateriasProfesor.Contains(e.NombreMateria)).ToList();
+                }
+
                 return View(examenes ?? new List<ExamenFront>());
             }
             catch (Exception ex)
@@ -48,6 +59,7 @@ namespace Front.Controllers
                 return Content($"Error al obtener exámenes: {ex.Message}\n\n{ex.StackTrace}");
             }
         }
+
         // GET: /Examen/GetAlumnosPorMateria/nombreMateria
         [Authorize(Roles = "Profesor")]
         [HttpGet]
@@ -75,8 +87,12 @@ namespace Front.Controllers
             List<HorarioFront>? horario = await _httpClient.GetFromJsonAsync<List<HorarioFront>>("horario");
             ViewBag.Horario = new SelectList(horario, "Descripcion", "Descripcion");
 
-            List<MateriaFront>? materia = await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia");
-            ViewBag.Materias = new SelectList(materia, "Nombre", "Nombre");
+            string dniProfesor = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            List<MateriaFront>? materiasDelProfesor = await _httpClient
+                .GetFromJsonAsync<List<MateriaFront>>($"Materia/DNIProfesor/{dniProfesor}");
+
+            ViewBag.Materias = new SelectList(materiasDelProfesor ?? new List<MateriaFront>(), "Nombre", "Nombre");
 
             return View();
         }

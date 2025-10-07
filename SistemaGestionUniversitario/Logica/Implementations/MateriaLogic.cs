@@ -312,7 +312,8 @@ namespace Negocio.Implementations
                 throw new ArgumentException("No se encontró un profesor con el DNI ingresado.");
             }
 
-            List<ProfesorMateria> profesorMaterias = (await _profesorMateriaRepository.FindByConditionAsync(t => t.IdProfesor == profesor.ID)).ToList();
+            List<ProfesorMateria> profesorMaterias =
+                (await _profesorMateriaRepository.FindByConditionAsync(t => t.IdProfesor == profesor.ID)).ToList();
 
             if (!profesorMaterias.Any())
             {
