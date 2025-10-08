@@ -16,7 +16,11 @@ namespace Front.Controllers
             {
                 return View();
             }
-        
+        public IActionResult HistoriaAcademica()
+        {
+            return View("HistoriaAcademica");
+        }
+
 
     }
 }

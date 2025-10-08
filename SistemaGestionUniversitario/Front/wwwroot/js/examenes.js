@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("Notas a enviar:", notas);
 
         try {
-            const response = await fetch('/Examen/CargarNotas', {
+            const response = await fetch('/Nota/CargarNotas', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

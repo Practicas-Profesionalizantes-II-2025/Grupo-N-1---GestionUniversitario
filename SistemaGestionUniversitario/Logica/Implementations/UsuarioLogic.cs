@@ -94,7 +94,7 @@ namespace Logica.Implementations
 
             await _usuarioRepository.AddAsync(usuarioNuevo);
 
-            if (usuarioNuevo.RolUsuario.ID == 3)
+            if (usuarioNuevo.RolUsuario.ID == 2)
             {
                 try
                 {
@@ -105,7 +105,7 @@ namespace Logica.Implementations
                     throw new ArgumentException("La fecha de contrato es obligatoria para el rol de profesor.");
                 }
             }
-            else if (usuarioNuevo.RolUsuario.ID == 2)
+            else if (usuarioNuevo.RolUsuario.ID == 3)
             {
                 try
                 {

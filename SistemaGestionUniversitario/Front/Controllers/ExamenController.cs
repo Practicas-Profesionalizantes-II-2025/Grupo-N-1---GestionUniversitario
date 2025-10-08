@@ -255,31 +255,6 @@ namespace Front.Controllers
                 return View(examen);
             }
         }
-        [Authorize(Roles = "Profesor")]
-        [HttpPost]
-        public async Task<IActionResult> CargarNotas([FromBody] List<CrearNotaAlumnoFront> notas)
-        {
-            try
-            {
-                foreach (var nota in notas)
-                {
-                    // Llamamos al endpoint de la API que guarda las notas
-                    var response = await _httpClient.PostAsJsonAsync("NotaAlumno", nota);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        var error = await response.Content.ReadAsStringAsync();
-                        _logger.LogError($"Error al guardar nota de {nota.DNIAlumno}: {error}");
-                    }
-                }
-
-                return Ok(new { mensaje = "Notas guardadas correctamente" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al guardar notas");
-                return BadRequest(new { mensaje = "Error al guardar notas" });
-            }
-        }
+        
     }
 }
