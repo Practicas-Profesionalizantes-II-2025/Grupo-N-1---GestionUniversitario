@@ -156,3 +156,63 @@ document.addEventListener("DOMContentLoaded", function () {
     filtroRol.addEventListener("change", aplicarFiltros);
     ordenNombre.addEventListener("change", aplicarFiltros);
 });
+
+
+//////////////////////////
+// VALIDICION
+///////////////////////////
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("infoUsuarioForm");
+    const errorDiv = document.getElementById("errorMensaje");
+    const successDiv = document.getElementById("successMensaje");
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        // Validación de campos requeridos
+        const camposInvalidos = [];
+        form.querySelectorAll("input[required]").forEach(input => {
+            if (!input.value.trim()) {
+                const label = form.querySelector(`label[for="${input.id}"]`);
+                camposInvalidos.push(label ? label.innerText.replace(":", "") : input.name);
+                input.classList.add("is-invalid");
+            } else {
+                input.classList.remove("is-invalid");
+            }
+        });
+
+        // Preparar envío
+        const formData = new FormData(form);
+        const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+        const token = tokenInput ? tokenInput.value : "";
+
+        // Deshabilitar botón para evitar envíos múltiples
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(form.action, {
+                method: "POST",
+                headers: { "RequestVerificationToken": token },
+                body: formData
+            });
+
+            // Cerrar modal automáticamente
+            const modalEl = document.getElementById("informacionUsuario");
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                setTimeout(() => modal.hide(), 1500);
+            }
+
+            // Opcional: actualizar tabla de usuarios sin recargar
+            if (typeof actualizarTablaUsuarios === "function") {
+                actualizarTablaUsuarios();
+            }
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    });
+});

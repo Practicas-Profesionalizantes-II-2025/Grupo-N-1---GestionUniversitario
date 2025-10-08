@@ -5,6 +5,7 @@ using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -223,7 +224,7 @@ namespace Front.Controllers
         // PUT: /Usuario/dni
         [Authorize(Roles = "Administrador")]
         [HttpPost]
-        public async Task<IActionResult> UpdateUsuario(string dni, ModificarUsuarioFront usuario)
+        public async Task<IActionResult> UpdateUsuario(string dni,ModificarUsuarioFront usuario)
         {
             try
             {
@@ -231,31 +232,39 @@ namespace Front.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    string mensajeError = "Error al actualizar el usuario.";
+
+                    try
                     {
-                        TempData["Error"] = "No se encontró el usuario con ese DNI.";
+                        using var doc = JsonDocument.Parse(errorContent);
+                        var root = doc.RootElement;
+
+                        if (root.TryGetProperty("mensaje", out var mensaje))
+                        {
+                            mensajeError = mensaje.GetString() ?? mensajeError;
+                        }
+                        else if (root.TryGetProperty("errors", out var errores))
+                        {
+                            var listaCampos = errores.EnumerateObject().Select(e => e.Name).ToList();
+                            mensajeError = $"Los campos {string.Join(", ", listaCampos)} son inválidos.";
+                        }
                     }
-                    else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    catch
                     {
-                        string error = await response.Content.ReadAsStringAsync();
-                        TempData["Error"] = $"Error de validación: {error}";
-                    }
-                    else
-                    {
-                        TempData["Error"] = "Ocurrió un error inesperado al actualizar el usuario.";
+                        // si no es JSON, mostrar texto crudo
+                        mensajeError = errorContent;
                     }
 
-                    return RedirectToAction("GetUsuarios");
+                    return Json(new { success = false, message = mensajeError });
                 }
 
-                TempData["Success"] = "Usuario actualizado correctamente.";
-                return RedirectToAction("GetUsuarios");
+                return Json(new { success = true, message = "Usuario actualizado correctamente." });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al actualizar usuario");
-                TempData["Error"] = "Error inesperado al actualizar el usuario.";
-                return RedirectToAction("GetUsuarios");
+                return Json(new { success = false, message = "Ocurrió un error inesperado." });
             }
         }
 

@@ -132,45 +132,45 @@
                     <div class="row">
                         <div class="col-md-6 mb-2">
                             <label for="infoDni" class="form-label">Usuario (DNI):</label>
-                            <input type="text" id="infoDni" name="dni" class="form-control" readonly />
+                            <input type="text" id="infoDni" name="dni" class="form-control" readonly  />
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="infoNombre" class="form-label">Nombre:</label>
-                            <input type="text" id="infoNombre" name="Nombre" class="form-control" />
+                            <input type="text" id="infoNombre" name="Nombre" class="form-control" required />
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="infoApellido" class="form-label">Apellido:</label>
-                            <input type="text" id="infoApellido" name="Apellido" class="form-control" />
+                            <input type="text" id="infoApellido" name="Apellido" class="form-control" required />
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="infoLocalidad" class="form-label">Localidad:</label>
-                            <input type="text" id="infoLocalidad" name="Localidad" class="form-control" />
+                            <input type="text" id="infoLocalidad" name="Localidad" class="form-control" required />
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="infoDireccion" class="form-label">Dirección:</label>
-                            <input type="text" id="infoDireccion" name="Direccion" class="form-control" />
+                            <input type="text" id="infoDireccion" name="Direccion" class="form-control" required />
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="infoCaracteristicaTelefono" class="form-label">Característica Teléfono:</label>
-                            <input type="text" id="infoCaracteristicaTelefono" name="CaracteristicaTelefono" class="form-control" />
+                            <input type="text" id="infoCaracteristicaTelefono" name="CaracteristicaTelefono" class="form-control" required />
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="infoNumeroTelefono" class="form-label">Número Teléfono:</label>
-                            <input type="text" id="infoNumeroTelefono" name="NumeroTelefono" class="form-control" />
+                            <input type="text" id="infoNumeroTelefono" name="NumeroTelefono" class="form-control" required />
                         </div>
                         <div class="col-md-6 mb-2">
                             <label for="infoRol" class="form-label">Rol:</label>
-                            <input type="text" id="infoRol" class="form-control" disabled />
+                            <input type="text" id="infoRol" class="form-control"  disabled />
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="btnModificar" class="btn btn-secondary">Modificar</button>
-                    <button type="submit" id="btnConfirmar" class="btn btn-primary">Confirmar</button>
+                    <button type="submit" id="btnConfirmar" class="btn btn-primary" required>Confirmar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script src="~/js/usuarios.js"></script>
+<script src="~/js/usuarios.js?v=@DateTime.Now.Ticks"></script>>
