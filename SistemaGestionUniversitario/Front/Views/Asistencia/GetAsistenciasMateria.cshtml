@@ -9,6 +9,22 @@
 <div class="container">
     <h3>Registro de Asistencias</h3>
 
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>⚠️ Error:</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            ✅ @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
     @if (!materias.Any())
     {
         <div class="alert alert-warning">⚠️ No tenés ninguna materia vinculada.</div>
@@ -110,8 +126,6 @@
                                                     Esta acción no se puede deshacer.
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-
                                                     <!-- formulario real de eliminación -->
                                                     <form asp-action="DeleteAsistencia" asp-controller="Asistencia" method="post" class="m-0">
                                                         @Html.AntiForgeryToken()
@@ -119,6 +133,8 @@
                                                         <input type="hidden" name="fecha" value="@grupo.Key.ToString("yyyy-MM-dd")" />
                                                         <button type="submit" class="btn btn-danger">Eliminar</button>
                                                     </form>
+
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                                 </div>
                                             </div>
                                         </div>

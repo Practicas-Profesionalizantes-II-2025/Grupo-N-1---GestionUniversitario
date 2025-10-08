@@ -15,8 +15,9 @@ namespace Logica.Implementations
         IDiaRepository _diaRepository;
         IHorarioRepository _horarioRepository;
         IDiaHorarioMateriaRepository _diaHorarioMateriaRepository;
+        IDiaLogic _diaLogic;
 
-        public AsistenciaLogic(IAsistenciaRepository asistenciaRepository, IAlumnoRepository alumnoRepository, IMateriaRepository materiaRepository, IInscripcionRepository inscripcionRepository, IDiaHorarioRepository diaHorarioRepository, IDiaRepository diaRepository, IHorarioRepository horarioRepository, IDiaHorarioMateriaRepository diaHorarioMateriaRepository)
+        public AsistenciaLogic(IAsistenciaRepository asistenciaRepository, IAlumnoRepository alumnoRepository, IMateriaRepository materiaRepository, IInscripcionRepository inscripcionRepository, IDiaHorarioRepository diaHorarioRepository, IDiaRepository diaRepository, IHorarioRepository horarioRepository, IDiaHorarioMateriaRepository diaHorarioMateriaRepository, IDiaLogic diaLogic)
         {
             _asistenciaRepository = asistenciaRepository;
             _alumnoRepository = alumnoRepository;
@@ -26,6 +27,7 @@ namespace Logica.Implementations
             _diaRepository = diaRepository;
             _horarioRepository = horarioRepository;
             _diaHorarioMateriaRepository = diaHorarioMateriaRepository;
+            _diaLogic = diaLogic;
         }
 
         public async Task AltaAsistencia(int idinscripcion, string nombreMateria, bool estado, DateTime fecha)
@@ -40,6 +42,51 @@ namespace Logica.Implementations
             if (camposErroneos.Count > 0)
             {
                 throw new ArgumentException("Los siguientes campos son inválidos: ", string.Join(", ", camposErroneos));
+            }
+
+            Materia? materiaExistente = (await _materiaRepository.FindByConditionAsync(m => m.Nombre == nombreMateria)).SingleOrDefault();
+            if (materiaExistente == null)
+            {
+                throw new InvalidOperationException("No se encontró la materia.");
+            }
+
+            List<string> listaDiasMateria = new List<string>();
+            foreach (DiaHorario diaHorario in materiaExistente.DiaHorario)
+            {
+                string diaDescripcion = await _diaLogic.ObtenerDescripcionDiaPorIDUsoInterno(diaHorario.IdDia);
+                if(diaDescripcion == "Lunes")
+                {
+                    diaDescripcion = "Monday";
+                }
+                else if(diaDescripcion == "Martes")
+                {
+                    diaDescripcion = "Tuesday";
+                }
+                else if(diaDescripcion == "Miércoles")
+                {
+                    diaDescripcion = "Wednesday";
+                }
+                else if(diaDescripcion == "Jueves")
+                {
+                    diaDescripcion = "Thursday";
+                }
+                else if(diaDescripcion == "Viernes")
+                {
+                    diaDescripcion = "Friday";
+                }
+                else
+                {
+                    diaDescripcion = "";
+                }
+
+                listaDiasMateria.Add(diaDescripcion);
+            }
+
+            DayOfWeek diaSemanaFechaIngresada = fecha.DayOfWeek;
+
+            if (!listaDiasMateria.Contains(diaSemanaFechaIngresada.ToString()))
+            {
+                throw new InvalidOperationException("La fecha ingresada no corresponde a un día de clase de la materia.");
             }
 
             Asistencia? asistenciaExistente = (await _asistenciaRepository.FindByConditionAsync(p => p.Fecha == fecha && p.IdInscripcion == idinscripcion)).FirstOrDefault();
@@ -70,7 +117,6 @@ namespace Logica.Implementations
             if (materiaExistente == null)
             {
                 throw new InvalidOperationException("No se encontró la materia.");
-
             }
 
             List<Inscripcion> inscripcionesExistentes = (await _inscripcionRepository.FindByConditionAsync(i => i.IdMateria == materiaExistente.ID)).ToList();

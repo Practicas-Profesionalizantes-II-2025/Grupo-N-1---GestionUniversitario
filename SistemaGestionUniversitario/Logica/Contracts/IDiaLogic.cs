@@ -6,5 +6,6 @@ namespace Logica.Contracts
     {
         Task<List<DiaDTO>> ObtenerDias();
         Task<DiaDTO> ObtenerDiaId(int id);
+        Task<String> ObtenerDescripcionDiaPorIDUsoInterno(int idDia);
     }
 }
