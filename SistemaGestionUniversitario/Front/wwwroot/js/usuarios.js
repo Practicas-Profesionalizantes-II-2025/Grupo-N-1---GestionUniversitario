@@ -163,8 +163,6 @@ document.addEventListener("DOMContentLoaded", function () {
 ///////////////////////////
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("infoUsuarioForm");
-    const errorDiv = document.getElementById("errorMensaje");
-    const successDiv = document.getElementById("successMensaje");
 
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -204,13 +202,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 setTimeout(() => modal.hide(), 1500);
             }
 
-            // Opcional: actualizar tabla de usuarios sin recargar
-            if (typeof actualizarTablaUsuarios === "function") {
-                actualizarTablaUsuarios();
-            }
-
+            location.reload();
         } catch (err) {
-            console.error(err);
+            error(err);
         } finally {
             if (submitBtn) submitBtn.disabled = false;
         }

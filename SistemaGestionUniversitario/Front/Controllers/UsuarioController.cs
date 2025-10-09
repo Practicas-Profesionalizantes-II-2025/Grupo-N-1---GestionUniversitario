@@ -258,8 +258,8 @@ namespace Front.Controllers
 
                     return Json(new { success = false, message = mensajeError });
                 }
+                return Json(new { success = true, message = "Usuario actualizado correctamente" });
 
-                return Json(new { success = true, message = "Usuario actualizado correctamente." });
             }
             catch (Exception ex)
             {

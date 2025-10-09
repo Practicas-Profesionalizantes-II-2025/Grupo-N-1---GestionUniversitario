@@ -215,7 +215,7 @@ namespace Datos.Contexts
                     .WithOne(e => e.Usuario)
                     .HasForeignKey("IdAlumnoUsuario")
                     .IsRequired(false);
-            });
+            }); 
         }
 
         public override int SaveChanges()
