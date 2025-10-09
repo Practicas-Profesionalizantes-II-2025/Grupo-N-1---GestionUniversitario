@@ -134,7 +134,7 @@
                     <!-- Tipo -->
                     <div class="mb-3">
                         <label class="form-label">Tipo *</label>
-                        <select name="Tipo" id="infoTipo" class="form-select" disabled>
+                        <select name="Tipo" id="infoTipo" class="form-select" required disabled>
                             <option value="">Seleccione...</option>
                             <option value="Final">Final</option>
                             <option value="Parcial">Parcial</option>
@@ -144,7 +144,7 @@
                     <!-- Materia -->
                     <div class="mb-3">
                         <label class="form-label">Materia *</label>
-                        <select name="NombreMateria" id="infoMateria" asp-items="ViewBag.Materias" class="form-select" disabled>
+                        <select name="NombreMateria" id="infoMateria" asp-items="ViewBag.Materias" class="form-select" required disabled>
                             <option value="">Seleccione...</option>
                         </select>
                     </div>
@@ -152,7 +152,7 @@
                     <!-- Horario -->
                     <div class="mb-3">
                         <label class="form-label">Horario *</label>
-                        <select name="DescripcionDiaHorario" id="infoHorario" asp-items="ViewBag.Horarios" class="form-select" disabled>
+                        <select name="DescripcionDiaHorario" id="infoHorario" asp-items="ViewBag.Horarios" class="form-select" required disabled>
                             <option value="">Seleccione...</option>
                         </select>
                     </div>
@@ -160,7 +160,7 @@
                     <!-- Fecha -->
                     <div class="mb-3">
                         <label class="form-label">Fecha *</label>
-                        <input name="Fecha" id="infoFecha" type="date" class="form-control" disabled />
+                        <input name="Fecha" id="infoFecha" type="date" class="form-control" required disabled />
                     </div>
                 </div>
 

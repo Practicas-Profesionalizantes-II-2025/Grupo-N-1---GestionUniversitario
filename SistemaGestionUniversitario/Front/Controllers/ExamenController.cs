@@ -236,11 +236,10 @@ namespace Front.Controllers
                                                      "Descripcion", "Descripcion");
                     ViewBag.Materias = new SelectList(await _httpClient.GetFromJsonAsync<List<MateriaFront>>("materia"),
                                                       "Nombre", "Nombre");
-                    return View(examen);
+                    return Json(new { success = false, message = "Error al actualizar examen" });
                 }
 
-                TempData["Success"] = "Examen actualizado correctamente.";
-                return RedirectToAction("GetExamenes");
+                return Json(new { success = true, message = "Usuario actualizado correctamente" });
             }
             catch (Exception ex)
             {
