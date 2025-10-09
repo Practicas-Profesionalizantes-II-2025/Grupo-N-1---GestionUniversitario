@@ -67,11 +67,34 @@ namespace API.Controllers
             {
                 await _asistenciaLogic.AltaAsistencia(crearAsistenciaDTO.idInscripcion, crearAsistenciaDTO.nombreMateria, crearAsistenciaDTO.Estado, crearAsistenciaDTO.Fecha);
 
+                return Ok("Asistencia registrada correctamente.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { mensaje = "Ocurrió un error inesperado al registrar la asistencia." });
+            }
+        }
+
+        [HttpDelete("{nombreMateria}/{fecha}")]
+        public async Task<IActionResult> Eliminar(string nombreMateria, DateTime fecha)
+        {
+            try
+            {
+                await _asistenciaLogic.EliminarAsistencia(nombreMateria, fecha);
+
                 return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(new { mensaje = ex.Message });
+                return BadRequest(ex);
             }
         }
 
@@ -95,21 +118,6 @@ namespace API.Controllers
         //    {
         //        return BadRequest(new { mensaje = ex.Message });
         //    }       
-        //}
-
-        //[HttpDelete("{dniAlumno}/{nombreMateria}/{fecha}")]
-        //public async Task<IActionResult> Eliminar(string dniAlumno, string nombreMateria, DateTime fecha)
-        //{
-        //    try
-        //    {
-        //        await _asistenciaLogic.EliminarAsistencia(dniAlumno, nombreMateria, fecha);
-
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex);
-        //    }
         //}
         #endregion
     }

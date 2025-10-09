@@ -127,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const button = event.relatedTarget;
         const nombreMateria = button.getAttribute('data-materia');
         const examenId = button.getAttribute('data-id');
-
         console.log("Materia:", nombreMateria);
         console.log("Examen ID:", examenId);
 
@@ -145,15 +144,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 tablaBody.innerHTML = '<tr><td colspan="3" class="text-center">No hay alumnos inscriptos.</td></tr>';
                 return;
             }
+            const notasResponse = await fetch(`/Examen/GetNotasPorExamen?idExamen=${examenId}`);
+            let notasExistentes = [];
+            if (notasResponse.ok) {
+                notasExistentes = await notasResponse.json();
+                console.log("Notas existentes:", notasExistentes);
+            } else {
+                console.warn("No se pudieron obtener las notas existentes o aún no hay ninguna cargada.");
+            }
+            console.log("Notas existentes:", notasExistentes);
 
             alumnos.forEach((alumno, index) => {
+
+                const notaExistente = notasExistentes.find(n => n.alumnoNombre === `${alumno.nombreAlumno} ${alumno.apellidoAlumno}`);
+                console.log(`Nota existente para`, notasExistentes.find(n => n.alumnoNombre));
+                const valorNota = notaExistente ? notaExistente.nota : '';
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td>${alumno.nombreAlumno} ${alumno.apellidoAlumno}</td>
                     <td>${alumno.dniAlumno}</td>
-                    <td>
-                        <input type="number" class="form-control nota-input" data-dni="${alumno.dniAlumno}" min="0" max="10" placeholder="Nota" required />
-                    </td>
+        <td>
+            <input type="number"
+                   class="form-control nota-input" 
+                   data-dni="${alumno.dniAlumno}"
+                   min="0" max="10"
+                   value="${valorNota}"
+                   placeholder="Nota" 
+                   required />
+        </td>
                 `;
                 tablaBody.appendChild(fila);
             });
@@ -194,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("Notas a enviar:", notas);
 
         try {
-            const response = await fetch('/Examen/CargarNotas', {
+            const response = await fetch('/Nota/CargarNotas', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

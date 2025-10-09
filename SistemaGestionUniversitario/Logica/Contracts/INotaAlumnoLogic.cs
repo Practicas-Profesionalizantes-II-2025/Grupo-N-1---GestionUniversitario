@@ -10,5 +10,6 @@ namespace Logica.Contracts
         Task<List<NotaAlumnoDTO>> ObtenerNotas();
         Task<List<NotaAlumnoDTO>> ObtenerNotasPorMateria(string nombreMateria);
         Task<List<NotaAlumnoDTO>> ObtenerNotasPorAlumno(string dniAlumno);
+        Task<List<NotaAlumnoDTO>> ObtenerNotasPorExamen(int idexamen);
     }
 }

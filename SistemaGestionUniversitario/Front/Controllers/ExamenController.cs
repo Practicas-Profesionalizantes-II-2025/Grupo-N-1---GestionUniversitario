@@ -255,30 +255,33 @@ namespace Front.Controllers
             }
         }
         [Authorize(Roles = "Profesor")]
-        [HttpPost]
-        public async Task<IActionResult> CargarNotas([FromBody] List<CrearNotaAlumnoFront> notas)
+        [HttpGet]
+        public async Task<IActionResult> GetNotasPorExamen(int idExamen)
         {
             try
             {
-                foreach (var nota in notas)
+                var response = await _httpClient.GetAsync($"NotaAlumno/idExamen/{idExamen}");
+                if(!response.IsSuccessStatusCode)
                 {
-                    // Llamamos al endpoint de la API que guarda las notas
-                    var response = await _httpClient.PostAsJsonAsync("NotaAlumno", nota);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
                         var error = await response.Content.ReadAsStringAsync();
-                        _logger.LogError($"Error al guardar nota de {nota.DNIAlumno}: {error}");
-                    }
-                }
+                        _logger.LogError($"Error al obtener notas: {error}");
+                        TempData["Error"] = "Error al obtener notas.";
+                        return RedirectToAction("GetExamenes");
 
-                return Ok(new { mensaje = "Notas guardadas correctamente" });
+                }
+                else
+                {
+                    var notas = await response.Content.ReadFromJsonAsync<List<NotaAlumnoFront>>();
+                    return Ok(notas);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al guardar notas");
-                return BadRequest(new { mensaje = "Error al guardar notas" });
+                _logger.LogError(ex, "Error al obtener notas por examen");
+                TempData["Error"] = "Error al obtener notas.";
+                return RedirectToAction("GetExamenes");
             }
         }
+
     }
 }

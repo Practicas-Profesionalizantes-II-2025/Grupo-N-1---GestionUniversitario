@@ -70,6 +70,25 @@ namespace API.Controllers
                 return BadRequest(new { mensaje = ex.Message });
             }
         }
+        [HttpGet("idExamen/{idExamen}")]
+        public async Task<IActionResult> ObtenerNotasPorExamen(int idExamen)
+        {
+            try
+            {
+                List<NotaAlumnoDTO> notaAlumnoDTO = await _notaAlumnoLogic.ObtenerNotasPorExamen(idExamen);
+
+                if (notaAlumnoDTO == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(notaAlumnoDTO);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> CrearNotaAlumno([FromBody] CrearNotaAlumnoDTO crearNotaAlumnoDTO)

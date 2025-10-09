@@ -241,5 +241,50 @@ namespace Logica.Implementations
                 throw new Exception($"{ex}");
             };
         }
+        public async Task<List<NotaAlumnoDTO>> ObtenerNotasPorExamen(int idexamen)
+        {
+            
+            try
+            {
+                Examen? examenExistente = (await _examenRepository.FindByConditionAsync(a => a.ID== idexamen)).FirstOrDefault();
+                if (examenExistente == null)
+                {
+                    throw new ArgumentNullException($"El examen con ID {idexamen} no existe.");
+                }
+
+                List<NotaAlumno> listaNotas = (await _notaAlumnoRepository.FindByConditionAsync(n => n.IdExamen == examenExistente.ID)).ToList();
+
+                if (listaNotas == null)
+                {
+                    return null;
+                }
+
+                List<NotaAlumnoDTO> listaNotasDTO = new List<NotaAlumnoDTO>();
+                foreach (NotaAlumno nota in listaNotas)
+                {
+                    Alumno? alumno = (await _alumnoRepository.FindByConditionAsync(a => a.ID == nota.IdAlumno)).FirstOrDefault();
+                    Examen? examen = (await _examenRepository.FindByConditionAsync(a => a.ID == nota.IdExamen)).FirstOrDefault();
+
+
+                    NotaAlumnoDTO notaDTO = new NotaAlumnoDTO()
+                    {
+                        ID = nota.ID,
+                        AlumnoNombre = $"{alumno.Usuario.Nombre} {alumno.Usuario.Apellido}",
+                        ExamenMateriaNombre = examen.Materia.Nombre,
+                        ExamenTipo = examen.Tipo,
+                        Nota = nota.Nota
+                    };
+
+                    listaNotasDTO.Add(notaDTO);
+                }
+
+                return listaNotasDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex}");
+            }
+            ;
+        }
     }
 }

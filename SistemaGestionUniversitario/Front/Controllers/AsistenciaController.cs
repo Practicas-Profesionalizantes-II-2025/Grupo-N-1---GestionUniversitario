@@ -3,6 +3,7 @@ using Front.Models.Respuestas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Front.Controllers
 {
@@ -89,13 +90,32 @@ namespace Front.Controllers
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        string error = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", error);
+                        var contenido = await response.Content.ReadAsStringAsync();
+                        string mensajeError;
+
+                        try
+                        {
+                            var errorObj = JsonSerializer.Deserialize<Dictionary<string, string>>(contenido);
+                            mensajeError = errorObj?["mensaje"] ?? "Error desconocido.";
+                        }
+                        catch
+                        {
+                            mensajeError = contenido;
+                        }
+
+                        TempData["Error"] = mensajeError;
+
+                        if (asistencias.Any())
+                        {
+                            return RedirectToAction("GetInscripcionesAsistencia", "Inscripcion", new { nombreMateria = asistencias.First().nombreMateria });
+                        }
+
                         return RedirectToAction("GetInscripcionesAsistencia", "Inscripcion");
                     }
+
                 }
 
-                TempData["Success"] = "Inscripcion dada de alta correctamente.";
+                TempData["Success"] = "Asistencia dada de alta correctamente.";
 
                 if (asistencias.Any())
                 {
@@ -106,7 +126,7 @@ namespace Front.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al dar de alta inscripcion.");
+                _logger.LogError(ex, "Error al dar de alta asistencia.");
 
                 if (asistencias.Any())
                 {
@@ -131,9 +151,27 @@ namespace Front.Controllers
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        string error = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", error);
-                        return RedirectToAction("GetAsistenciasMateria", "Asistencia", new { nombreMateria = asistencia.nombreMateria });
+                        var contenido = await response.Content.ReadAsStringAsync();
+                        string mensajeError;
+
+                        try
+                        {
+                            var errorObj = JsonSerializer.Deserialize<Dictionary<string, string>>(contenido);
+                            mensajeError = errorObj?["mensaje"] ?? "Error desconocido.";
+                        }
+                        catch
+                        {
+                            mensajeError = contenido;
+                        }
+
+                        TempData["Error"] = mensajeError;
+
+                        if (asistencias.Any())
+                        {
+                            return RedirectToAction("GetAsistenciasMateria", "Asistencia", new { nombreMateria = asistencias.First().nombreMateria });
+                        }
+
+                        return RedirectToAction("GetAsistenciasMateria", "Asistencia");
                     }
                 }
 
@@ -149,12 +187,47 @@ namespace Front.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al dar de alta inscripcion.");
+                _logger.LogError(ex, "Error al actualizar asistencia.");
                 if (asistencias.Any())
                 {
                     return RedirectToAction("GetAsistenciasMateria", "Asistencia", new { nombreMateria = asistencias.First().nombreMateria });
                 }
                 return RedirectToAction("GetAsistenciasMateria", "Asistencia");
+            }
+        }
+
+        // DELETE: /Asistencia/nombreMateria/fecha
+        [Authorize(Roles = "Profesor")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteAsistencia(string nombreMateria, DateTime fecha)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.DeleteAsync($"Asistencia/{nombreMateria}/{fecha:yyyy-MM-dd}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        string error = await response.Content.ReadAsStringAsync();
+                        TempData["Error"] = $"Error de validación: {error}";
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Ocurrió un error inesperado al dar de baja la asistencia.";
+                    }
+
+                    return RedirectToAction("GetAsistenciasMateria", new { nombreMateria });
+                }
+
+                TempData["Success"] = "Asistencia dada de baja correctamente.";
+                return RedirectToAction("GetAsistenciasMateria", new { nombreMateria });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al dar de baja la asistencia");
+                TempData["Error"] = "Ocurrió un error al dar de baja la asistencia.";
+                return RedirectToAction("GetAsistenciasMateria", new { nombreMateria });
             }
         }
     }

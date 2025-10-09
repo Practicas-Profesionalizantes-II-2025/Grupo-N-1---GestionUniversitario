@@ -1,4 +1,5 @@
 ﻿using Datos.Repositories.Contracts;
+using Datos.Repositories.Implementations;
 using Entidades.DTOs.Respuestas;
 using Entidades.Entities;
 using Logica.Contracts;
@@ -54,6 +55,17 @@ namespace Logica.Implementations
             };
 
             return diaDTO;
+        }
+        public async Task<String> ObtenerDescripcionDiaPorIDUsoInterno(int idDia)
+        {
+            Dia? dia = (await _diaRepository.FindByConditionAsync(d => d.ID == idDia)).FirstOrDefault();
+
+            if (dia == null)
+            {
+                return null;
+            }
+
+            return $"{dia.Descripcion}";
         }
     }
 }
