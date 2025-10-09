@@ -249,6 +249,7 @@ namespace Front.Controllers
                 return Content($"Error al obtener materias del profesor: {ex.Message}");
             }
         }
+       
 
     }
 }

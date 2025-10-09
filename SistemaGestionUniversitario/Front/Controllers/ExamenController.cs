@@ -255,6 +255,34 @@ namespace Front.Controllers
                 return View(examen);
             }
         }
-        
+        [Authorize(Roles = "Profesor")]
+        [HttpGet]
+        public async Task<IActionResult> GetNotasPorExamen(int idExamen)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"NotaAlumno/idExamen/{idExamen}");
+                if(!response.IsSuccessStatusCode)
+                {
+                        var error = await response.Content.ReadAsStringAsync();
+                        _logger.LogError($"Error al obtener notas: {error}");
+                        TempData["Error"] = "Error al obtener notas.";
+                        return RedirectToAction("GetExamenes");
+
+                }
+                else
+                {
+                    var notas = await response.Content.ReadFromJsonAsync<List<NotaAlumnoFront>>();
+                    return Ok(notas);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener notas por examen");
+                TempData["Error"] = "Error al obtener notas.";
+                return RedirectToAction("GetExamenes");
+            }
+        }
+
     }
 }

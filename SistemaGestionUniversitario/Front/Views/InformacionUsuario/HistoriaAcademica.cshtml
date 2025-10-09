@@ -12,12 +12,12 @@
             <div id="alert-container"></div>
 
             <div class="table-responsive">
-                <table id="tablaNotas" class="table table-striped table-hover align-middle">
-                    <thead class="table-primary">
+                <table id="tablaNotas" class="table table-hover align-middle">
+                    <thead class="table-primary text-center">
                         <tr>
-                            <th>Materia</th>
-                            <th>Tipo de Examen</th>
-                            <th>Nota</th>
+                            <th style="width: 40%;">Materia</th>
+                            <th style="width: 40%;">Tipo de Examen</th>
+                            <th style="width: 20%;">Nota</th>
                         </tr>
                     </thead>
                     <tbody id="tablaNotasBody">
@@ -41,40 +41,47 @@
 
             try {
                 const response = await fetch(`/Nota/ObtenerNotasPorAlumno`);
-				console.log(response);
-                if (!response.ok) {
-                    throw new Error("Error al obtener las notas del alumno.");
-                }
+                if (!response.ok) throw new Error("Error al obtener las notas del alumno.");
 
                 const notas = await response.json();
-
-                tablaBody.innerHTML = ""; // limpiar contenido anterior
+                tablaBody.innerHTML = "";
 
                 if (notas.length === 0) {
                     mostrarAlerta("No se encontraron notas registradas para este alumno.", "info");
                     return;
                 }
 
-                // Ordenar por materia y tipo
-                notas.sort((a, b) => {
-                    if (a.examenMateriaNombre === b.examenMateriaNombre)
-                        return a.examenTipo.localeCompare(b.examenTipo);
-                    return a.examenMateriaNombre.localeCompare(b.examenMateriaNombre);
-                });
-
+                // Agrupar por materia
+                const materiasAgrupadas = {};
                 notas.forEach(nota => {
-                    const fila = document.createElement("tr");
-
-                    const claseNota = nota.nota >= 6 ? "text-success fw-bold" : "text-danger fw-bold";
-
-                    fila.innerHTML = `
-                        <td>${nota.examenMateriaNombre}</td>
-                        <td>${nota.examenTipo}</td>
-                        <td class="${claseNota}">${nota.nota}</td>
-                    `;
-
-                    tablaBody.appendChild(fila);
+                    if (!materiasAgrupadas[nota.examenMateriaNombre]) {
+                        materiasAgrupadas[nota.examenMateriaNombre] = [];
+                    }
+                    materiasAgrupadas[nota.examenMateriaNombre].push(nota);
                 });
+
+                // Renderizar
+                for (const materia in materiasAgrupadas) {
+                    // Fila de título elegante
+                    const filaMateria = document.createElement("tr");
+                    filaMateria.innerHTML = `
+                        <td colspan="3" class="fw-bold bg-light border-top ps-3">${materia}</td>
+                    `;
+                    tablaBody.appendChild(filaMateria);
+
+                    // Fila de cada examen
+                    materiasAgrupadas[materia].forEach(nota => {
+                        const filaNota = document.createElement("tr");
+                        const claseNota = nota.nota >= 6 ? "text-success fw-bold" : "text-danger fw-bold";
+
+                        filaNota.innerHTML = `
+                            <td></td>
+                            <td class="text-center">${nota.examenTipo}</td>
+                            <td class="text-center ${claseNota}">${nota.nota}</td>
+                        `;
+                        tablaBody.appendChild(filaNota);
+                    });
+                }
             } catch (error) {
                 mostrarAlerta(error.message, "danger");
                 tablaBody.innerHTML = `
