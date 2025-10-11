@@ -153,8 +153,26 @@ namespace Front.Controllers
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                     {
-                        string error = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", $"Error de validación: {error}");
+                        string errorJson = await response.Content.ReadAsStringAsync();
+
+                        try
+                        {
+                            // intenta leer el JSON devuelto por la API
+                            var errorObj = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(errorJson);
+                            if (errorObj != null && errorObj.ContainsKey("mensaje"))
+                            {
+                                ModelState.AddModelError("", errorObj["mensaje"]);
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("", "Error de validación desconocido.");
+                            }
+                        }
+                        catch
+                        {
+                            // si por alguna razón no es JSON válido, se muestra el texto crudo
+                            ModelState.AddModelError("", $"Error de validación: {errorJson}");
+                        }
                     }
                     else
                     {
