@@ -16,8 +16,6 @@ namespace Datos.Repositories.Implementations
         {
             return await _context.Alumno
                 .Include(u => u.Usuario)
-                .Include(u => u.Materias)
-                .Include(u => u.Examenes)
                 .ToListAsync();
         }
 
@@ -25,8 +23,6 @@ namespace Datos.Repositories.Implementations
         {
             return await _context.Alumno
                 .Include(u => u.Usuario)
-                .Include(u => u.Materias)
-                .Include(u => u.Examenes)
                 .Where(expression)
                 .ToListAsync();
         }
