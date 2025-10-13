@@ -118,22 +118,36 @@
             document.getElementById('anioMateria').value = materia.Anio;
             document.getElementById('modalidadMateria').value = materia.Modalidad;
 
-            function nombresCoinciden(nombreA, nombreB) {
-                // Divide, ordena y compara
-                const partesA = nombreA.trim().toLowerCase().split(' ').sort();
-                const partesB = nombreB.trim().toLowerCase().split(' ').sort();
-                return partesB.join(', ') === partesA.join(' ');
+            function normalizarTexto(texto) {
+                return texto
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "") // elimina acentos
+                    .replace(/\s+/g, " ")             // quita espacios dobles
+                    .trim()
+                    .toLowerCase();
             }
 
-            // Profesores: comparación en minúsculas y trim
-            const profesoresIDs = materia.NombresProfesores
-                .map(nombreProf => {
-                    const prof = listaProfesores.find(p =>
-                        nombresCoinciden(p.NombreCompleto, nombreProf)
-                    );
-                    return prof ? prof.ID : null;
-                })
-                .filter(id => id != null);
+            function nombresCoinciden(nombreA, nombreB) {
+                const a = normalizarTexto(nombreA);
+                const b = normalizarTexto(nombreB);
+
+                // Si son iguales directo
+                if (a === b) return true;
+
+                // Intentar comparar si están invertidos
+                const partesA = a.replace(",", "").split(" ").sort().join(" ");
+                const partesB = b.replace(",", "").split(" ").sort().join(" ");
+                return partesA === partesB;
+            }
+
+            const profesoresIDs = materia.NombresProfesores.map(nombreProf => {
+                const prof = listaProfesores.find(p =>
+                    nombresCoinciden(p.NombreCompleto, nombreProf)
+                );
+                return prof ? prof.ID : null;
+            }).filter(id => id != null);
+
+            $('#profesoresSelect').val(profesoresIDs).trigger('change');
 
             // Días y horarios
             const diasHorariosIDs = materia.DescripcionDiasHorarios
@@ -145,7 +159,6 @@
                 })
                 .filter(id => id != null);
 
-            $('#profesoresSelect').val(profesoresIDs).trigger('change');
             $('#horariosSelect').val(diasHorariosIDs).trigger('change');
         }
     </script>
