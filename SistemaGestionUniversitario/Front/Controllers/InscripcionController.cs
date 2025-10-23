@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
+using Front.Metricas;
 
 namespace Front.Controllers
 {
@@ -146,6 +147,10 @@ namespace Front.Controllers
                 }
 
                 TempData["Success"] = "Inscripcion dada de alta correctamente.";
+
+                // Incrementar métrica Prometheus
+                DefinicionesMetricas.InscripcionesCounter.Inc();
+
                 return RedirectToAction("GetInscripcionesDNI");
             }
             catch (Exception ex)
