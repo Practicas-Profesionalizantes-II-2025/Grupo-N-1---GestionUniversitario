@@ -8,11 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Servicios
 builder.Services.AddControllersWithViews();
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenLocalhost(9184); // para /metrics HTTP local
-    // mantén el listener HTTPS por defecto para la app si lo necesitas
-});
 // Registro de HttpClient hacia APIs
 builder.Services.AddHttpClient("ApiPrincipal", client =>
 {
@@ -45,9 +40,17 @@ builder.Services.AddScoped<IAuthenticator, Authenticator>();
 // App
 var app = builder.Build();
 
-app.UseHttpMetrics();
-app.MapMetrics();
 
+app.UseStaticFiles();
+
+app.UseRouting();
+app.UseMetricServer();
+app.UseMiddleware<RequestTimingMiddleware>();
+
+// Session y Authenticator
+app.UseSession();
+app.UseAuthentication();
+app.UseAuthorization();
 // Manejo de errores y seguridad HTTPS
 if (!app.Environment.IsDevelopment())
 {
@@ -56,16 +59,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-app.UseMiddleware<RequestTimingMiddleware>();
 
 
-// Session y Authenticator
-app.UseSession();
-app.UseAuthentication();
-app.UseAuthorization();
 
 // Ruta por defecto MVC
 app.MapControllerRoute(
